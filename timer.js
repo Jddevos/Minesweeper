@@ -32,7 +32,7 @@ function resetTimer() {
 	difference = 0;
 	paused = 0;
 	running = 0;
-	timerDisplay.innerHTML = '';
+	timerDisplay.innerHTML = '00:00:000';
 }
 
 function getShowTime() {

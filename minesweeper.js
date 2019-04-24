@@ -147,6 +147,24 @@ function generateDisplay() {
 	boardDiv = document.getElementById("board");
 	boardDiv.innerHTML = "";
 
+	//Generate info panel
+	infoDiv = document.createElement('div');
+	timerSpan = document.createElement('span');
+	flagsSpan = document.createElement('span');
+
+	infoDiv.id = "infoContainer";
+	timerSpan.className = "timer";
+	timerSpan.id = "timer";
+	timerSpan.innerHTML = "00:00:000";
+	flagsSpan.className = "remainingFlags";
+	flagsSpan.id = "remainingFlags";
+	flagsSpan.innerHTML = "flags left";
+
+	infoDiv.appendChild(timerSpan);
+	infoDiv.appendChild(flagsSpan);
+
+	boardDiv.appendChild(infoDiv);	//Append to boardDiv
+
 	//Generate cells
 	for (var i = 0; i < totalRows; i++) {
 		var rowDiv = document.createElement('div');
@@ -157,23 +175,6 @@ function generateDisplay() {
 		}
 		boardDiv.appendChild(rowDiv);
 	}
-
-	//Generate info panel
-	infoDiv = document.createElement('div');
-	timerSpan = document.createElement('span');
-	flagsSpan = document.createElement('span');
-
-	infoDiv.id = "infoContainer";
-	timerSpan.className = "timer";
-	timerSpan.id = "timer";
-	flagsSpan.className = "remainingFlags";
-	flagsSpan.id = "remainingFlags";
-
-	infoDiv.appendChild(timerSpan);
-	infoDiv.appendChild(flagsSpan);
-
-	//Append to boardDiv
-	boardDiv.appendChild(infoDiv);
 }
 
 function isUndefined(_arr, _index1, _index2) {
