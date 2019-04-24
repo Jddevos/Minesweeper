@@ -7,25 +7,25 @@ var savedTime;
 var paused = 0;
 var running = 0;
 
-function startTimer(){
-  if(!running){
-	startTime = new Date().getTime();
-	tInterval = setInterval(getShowTime, 1);
-	// change 1 to 1000 above to run script every second instead of every millisecond. one other change will be needed in the getShowTime() function below for this to work. see comment there.   
- 
-	paused = 0;
-	running = 1;
-  }
+function startTimer() {
+	if (!running) {
+		startTime = new Date().getTime();
+		tInterval = setInterval(getShowTime, 1);
+		// change 1 to 1000 above to run script every second instead of every millisecond. one other change will be needed in the getShowTime() function below for this to work. see comment there.   
+
+		paused = 0;
+		running = 1;
+	}
 }
 
-function pauseTimer(){
+function pauseTimer() {
 	clearInterval(tInterval);
 	savedTime = difference;
 	paused = 1;
 	running = 0;
 }
 
-function resetTimer(){
+function resetTimer() {
 	timerDisplay = document.getElementById('timer');
 	clearInterval(tInterval);
 	savedTime = 0;
@@ -35,14 +35,14 @@ function resetTimer(){
 	timerDisplay.innerHTML = '';
 }
 
-function getShowTime(){
+function getShowTime() {
 	timerDisplay = document.getElementById('timer');
 
 	updatedTime = new Date().getTime();
-	if (savedTime){
+	if (savedTime) {
 		difference = (updatedTime - startTime) + savedTime;
 	} else {
-		difference =  updatedTime - startTime;
+		difference = updatedTime - startTime;
 	}
 
 	// var days = Math.floor(difference / (1000 * 60 * 60 * 24));

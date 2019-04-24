@@ -1,36 +1,40 @@
 <!doctype html>
 <html lang="en">
-<meta charset="UTF-8"> 
-<head>
-	<link rel="stylesheet" href="minesweeperStyle.css" />
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="minesweeper.js"></script>
-</head>
-<body onload="start()">
-	<form autocomplete="off">
-		<div class="inputArea">
-			<span class="inputLabelSpan">Rows:</span>
-			<span class="inputTextSpan"><input type="number" name="rows" id="rows" min="5" max="35" value="9" class="inputNumber"></span>
-		</div>
-		<div class="inputArea">
-			<span class="inputLabelSpan">Columns:</span>
-			<span class="inputTextSpan"><input type="number" name="cols" id="cols" min="5" max="75" value="9" class="inputNumber"></span>
-		</div>
-		<div class="inputArea">
-			<span class="inputLabelSpan">Mines:</span>
-			<span class="inputTextSpan"><input type="number" name="mines" id="mines" min="0" max="100" value="10" class="inputNumber"></span>
-		</div>
+	<meta charset="UTF-8">
+	<head>
+		<link rel="stylesheet" href="minesweeperStyle.css" />
+		<script
+			src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="minesweeper.js"></script>
+	</head>
+	<body onload="start()">
+		<form autocomplete="off">
+			<div class="inputArea">
+				<span class="inputLabelSpan">Rows:</span>
+				<span class="inputTextSpan"><input type="number" name="rows" id="rows"
+						min="5" max="35" value="9" class="inputNumber"></span>
+			</div>
+			<div class="inputArea">
+				<span class="inputLabelSpan">Columns:</span>
+				<span class="inputTextSpan"><input type="number" name="cols" id="cols"
+						min="5" max="75" value="9" class="inputNumber"></span>
+			</div>
+			<div class="inputArea">
+				<span class="inputLabelSpan">Mines:</span>
+				<span class="inputTextSpan"><input type="number" name="mines" id="mines"
+						min="0" max="100" value="10" class="inputNumber"></span>
+			</div>
+			<br />
+			<input type="button" value="Generate" onclick="start()">
+		</form>
 		<br />
-		<input type="button" value="Generate" onclick="start()">
-	</form>
-	<br />
 
-	<div id="board">
-	</div>
+		<div id="board">
+		</div>
 
-	<div id="alertPanel">
-	</div>
+		<div id="alertPanel">
+		</div>
 
-	<script src="timer.js"></script>
-</body>
+		<script src="timer.js"></script>
+	</body>
 </html>
