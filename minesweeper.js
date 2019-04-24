@@ -215,6 +215,11 @@ function loseEndGame() {
 				curBtn.value = "*";
 				curBtn.className += " exploded";
 			}
+
+			//X out the incorrect flags
+			if (!board[i][j].mine && curBtn.value == 'F') {
+				curBtn.value = "x";
+			}
 		}
 	}
 	disableBoard();
