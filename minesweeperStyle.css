@@ -36,12 +36,15 @@ button {
 }
 
 .inputLabelSpan {
-	float: left;
+	display: inline-block;
+	width: 100px;
+	text-align: right;
 }
 
 .inputNumber {
 	width: 50px;
 	margin: 10px;
+	display: inline-block;
 }
 
 .inputTextSpan {
