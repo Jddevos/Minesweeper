@@ -209,7 +209,9 @@ function loseEndGame() {
 	for (var i = 0; i < totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
 			var curBtn = document.getElementById('btn_' + i + '_' + j);
-			if (board[i][j].mine) {
+
+			//Explode the unmarked mines
+			if (board[i][j].mine && curBtn.value != 'F') {
 				curBtn.value = "*";
 				curBtn.className += " exploded";
 			}
