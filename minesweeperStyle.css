@@ -15,9 +15,11 @@ button {
 	border-style: inset;
 	border-color: red;
 }
+
 .flagged {
 	color: red;
 }
+
 .gameBoardBtn {
 	border-radius: 0;
 	width: 25px;
@@ -25,45 +27,85 @@ button {
 	font-weight: bold;
 	text-align: center;
 }
+
 .gameBoardRow {}
+
 .inputArea {
 	width: 30%;
 	height: 20px;
 }
+
 .inputLabelSpan {
 	float: left;
 }
+
 .inputNumber {
 	width: 50px;
 	margin: 10px;
 }
+
 .inputTextSpan {
 	float: right;
 }
+
 .pressed {
 	background-color: darkgray;
 	border: none;
 }
+
 .remainingFlags {
 	float: right;
 }
 
-.textQ {color: orange;}
-.textF {color: darkred;}
-.textB {color: darkred;}
-.text1 {color: blue;}
-.text2 {color: green;}
-.text3 {color: red;}
-.text4 {color: purple;}
-.text5 {color: black;}
-.text6 {color: maroon;}
-.text7 {color: white;}
-.text8 {color: turquoise;}
+.textQ {
+	color: orange;
+}
+
+.textF {
+	color: darkred;
+}
+
+.textB {
+	color: darkred;
+}
+
+.text1 {
+	color: blue;
+}
+
+.text2 {
+	color: green;
+}
+
+.text3 {
+	color: red;
+}
+
+.text4 {
+	color: purple;
+}
+
+.text5 {
+	color: black;
+}
+
+.text6 {
+	color: maroon;
+}
+
+.text7 {
+	color: white;
+}
+
+.text8 {
+	color: turquoise;
+}
 
 #infoContainer {
 	font-family: 'Courier New';
 	border-top: 2px solid black;
 }
+
 .timer {
 	color: #000;
 }
