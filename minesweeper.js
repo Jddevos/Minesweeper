@@ -237,26 +237,31 @@ function play(ele, event) {
 		//Left click
 		// console.log('Left click at '+clickedRow+", "+clickedCol);
 
-		//Check for Lose
-		if (board[clickedRow][clickedCol].mine) {
-			clickedBtn.className += " text5";
-			loseEndGame();
-		}
+		//Check for a flag already being here
+		if (clickedBtn.value == "") {
+			//If there is not a flag, we can take action
 
-		//Check if blank
-		if (board[clickedRow][clickedCol].value == 0) {
-			toCheck.push({ row: clickedRow, col: clickedCol });
-			//We want to set this button to pressed, and expand until we hit the edge or numbers
-			while (toCheck.length > 0) {
-				expandEmptySpace();
+			//Check for Lose
+			if (board[clickedRow][clickedCol].mine) {
+				clickedBtn.className += " text5";
+				loseEndGame();
 			}
-		}
 
-		//Check if number
-		if (board[clickedRow][clickedCol].value > 0) {
-			clickedBtn.className += " pressed text" + board[clickedRow][clickedCol].value;
-			clickedBtn.value = board[clickedRow][clickedCol].value;
-			board[clickedRow][clickedCol].visited = true;
+			//Check if blank
+			if (board[clickedRow][clickedCol].value == 0) {
+				toCheck.push({ row: clickedRow, col: clickedCol });
+				//We want to set this button to pressed, and expand until we hit the edge or numbers
+				while (toCheck.length > 0) {
+					expandEmptySpace();
+				}
+			}
+
+			//Check if number
+			if (board[clickedRow][clickedCol].value > 0) {
+				clickedBtn.className += " pressed text" + board[clickedRow][clickedCol].value;
+				clickedBtn.value = board[clickedRow][clickedCol].value;
+				board[clickedRow][clickedCol].visited = true;
+			}
 		}
 	}
 	if (event.type == 'contextmenu') {

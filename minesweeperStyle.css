@@ -1,8 +1,9 @@
 /* ELEMENTS */
 button {
-	margin: -1px;
+    margin: -1px;
 	padding: -1px;
 }
+
 
 /* IDS */
 #board {
@@ -26,11 +27,19 @@ button {
 	color: red;
 }
 .gameBoardBtn {
+	font-size: 100%;
 	border-radius: 0;
 	width: 25px;
 	height: 25px;
 	font-weight: bold;
 	text-align: center;
+	line-height: 0;
+	overflow: hidden;
+	display: inline-block;
+}
+.gameBoardRow {
+	height: 25px;
+	display: block;
 }
 .inputArea {
 	width: 30%;
@@ -49,14 +58,16 @@ button {
 .inputTextSpan {
 	float: right;
 }
-.pressed {
+ .pressed {
+	margin: 0;
+	padding: 0;
 	background-color: darkgray;
 	border: none;
 }
 .remainingFlags {
 	float: right;
 }
-.textQ {
+ .textQ {
 	color: orange;
 }
 .textF {
