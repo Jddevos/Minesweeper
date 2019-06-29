@@ -44,7 +44,7 @@ function disableBoard() {
 		for (var j = 0; j < totalCols; j++) {
 			var curBtn = document.getElementById('btn_' + i + '_' + j);
 
-			//Disable the button
+			//Disable the button by adding the disabled class
 			curBtn.className += " disabled";
 		}
 	}
