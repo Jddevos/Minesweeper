@@ -36,7 +36,9 @@ button {
 	border: 1px solid darkgray;
 	width: 25px;
 	height: 25px;
-	font-weight: normal;
+	line-height: 25px;
+	vertical-align: middle;
+	font-weight: bold;
 	text-align: center;
 	overflow: hidden;
 	display: inline-block;
@@ -81,6 +83,9 @@ button {
 }
 .textB {
 	color: darkred;
+}
+.textM {
+	color: black;
 }
 .text1 {
 	color: blue;

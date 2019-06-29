@@ -1,8 +1,12 @@
 var board = new Array();	//This will hold the game board in its entirety
 var toCheck = new Array();	//Will hold the list of cells to check when expanding empty space
-var totalRows;
-var totalCols;
-var totalMines;
+var totalRows = 0;
+var totalCols = 0;
+var totalMines = 0;
+var generatedBoard = false;
+var mineChar = "O";	//Character to display to indicate a mine
+var flagChar = "F";	//Character to display to indicate a flag
+var quesChar = "?";	//Character to display to indicate a question
 
 document.oncontextmenu = function () {
 	//This disables the right click context menu
@@ -55,7 +59,7 @@ function displayMines() {
 		for (var j = 0; j < totalCols; j++) {
 			var cur = document.getElementById('btn_' + i + '_' + j);
 			if (!cur.classList.contains('pressed') && cur.innerHTML == "" && board[i][j].mine) {
-				cur.innerHTML = "*";
+				cur.innerHTML = mineChar;
 				cur.classList.add('textB');
 			}
 		}
@@ -103,7 +107,9 @@ function expandEmptySpace() {
 	// console.log(toCheck[0].row + ' ' + toCheck[0].col);
 }
 
-function generateBoard() {
+function generateBoard(initClick) {
+	//Parameters are the initial click. We need to avoid generating mines there
+
 	//Clear the board
 	board = new Array();
 
@@ -123,22 +129,26 @@ function generateBoard() {
 			r = Math.floor(Math.random() * totalRows)
 			c = Math.floor(Math.random() * totalCols)
 			// console.log("Checking " +r+ ", " +c);
-		} while (board[r][c].mine == true)
+		} while (board[r][c].mine == true && r*totalRows+c != initClick)
+		//This while calculation ensures that the initial click isnt a mine
 
 		// console.log("Placing mine at " +r+ ", " +c)
 		board[r][c].mine = true;
-		board[r][c].value = "*";
+		board[r][c].value = mineChar;
 
 		//increment the cells around the mine
-		if (!isUndefined(board, r + 1, c)) { board[r + 1][c].value++; }
-		if (!isUndefined(board, r - 1, c)) { board[r - 1][c].value++; }
-		if (!isUndefined(board, r, c + 1)) { board[r][c + 1].value++; }
-		if (!isUndefined(board, r, c - 1)) { board[r][c - 1].value++; }
-		if (!isUndefined(board, r + 1, c + 1)) { board[r + 1][c + 1].value++; }
-		if (!isUndefined(board, r + 1, c - 1)) { board[r + 1][c - 1].value++; }
-		if (!isUndefined(board, r - 1, c + 1)) { board[r - 1][c + 1].value++; }
-		if (!isUndefined(board, r - 1, c - 1)) { board[r - 1][c - 1].value++; }
+		if (!isUndefined(board, r + 1, c) && board[r + 1][c].value != mineChar) { board[r + 1][c].value++; }
+		if (!isUndefined(board, r - 1, c) && board[r - 1][c].value != mineChar) { board[r - 1][c].value++; }
+		if (!isUndefined(board, r, c + 1) && board[r][c + 1].value != mineChar) { board[r][c + 1].value++; }
+		if (!isUndefined(board, r, c - 1) && board[r][c - 1].value != mineChar) { board[r][c - 1].value++; }
+		if (!isUndefined(board, r + 1, c + 1) && board[r + 1][c + 1].value != mineChar) { board[r + 1][c + 1].value++; }
+		if (!isUndefined(board, r + 1, c - 1) && board[r + 1][c - 1].value != mineChar) { board[r + 1][c - 1].value++; }
+		if (!isUndefined(board, r - 1, c + 1) && board[r - 1][c + 1].value != mineChar) { board[r - 1][c + 1].value++; }
+		if (!isUndefined(board, r - 1, c - 1) && board[r - 1][c - 1].value != mineChar) { board[r - 1][c - 1].value++; }
 	}
+
+	//Mark the board as generated
+	generatedBoard = true;
 
 	// console.log(board);
 }
@@ -199,7 +209,7 @@ function isValid() {
 	else if (totalCols < 5 || totalCols > 75) {
 		valid = false;
 	}
-	else if (totalMines < 0 || totalMines > totalRows * totalCols) {
+	else if (totalMines < 1 || totalMines > totalRows*totalCols-1) {
 		valid = false;
 	}
 
@@ -213,13 +223,15 @@ function loseEndGame() {
 			var curBtn = document.getElementById('btn_' + i + '_' + j);
 
 			//Explode the unmarked mines
-			if (board[i][j].mine && curBtn.innerHTML != 'F') {
-				curBtn.innerHTML = "*";
+			if (board[i][j].mine && curBtn.innerHTML != flagChar) {
+				// console.log("Setting btn_"+i+"_"+j+" to "+board[i][j].value);
+				curBtn.innerHTML = board[i][j].value;
 				curBtn.className += " exploded";
 			}
 
 			//X out the incorrect flags
-			if (!board[i][j].mine && curBtn.innerHTML == 'F') {
+			else if (!board[i][j].mine && curBtn.innerHTML == flagChar) {
+				// console.log("Setting btn_"+i+"_"+j+" to x");
 				curBtn.innerHTML = "x";
 			}
 		}
@@ -228,23 +240,31 @@ function loseEndGame() {
 }
 
 function play(ele, event) {
-	startTimer(); //Start the timer, if it isnt already
 	var clickedRow = ele.getAttribute('row');
 	var clickedCol = ele.getAttribute('col')
 	var clickedBtn = document.getElementById('btn_' + clickedRow + '_' + clickedCol);
-	// console.log('Value: ' +board[clickedRow][clickedCol].value);
+
+	// console.log("row: "+clickedRow+", col: "+clickedCol);
+
+	//We need to generate the board if it doesnt already exist
+	if (!generatedBoard) {
+		// console.log("Num: "+clickedRow*totalRows+clickedCol);
+		generateBoard(clickedRow*totalRows+clickedCol);
+	}
+
+	startTimer(); //Start the timer, if it isnt already
 
 	if (event.type == 'click') {
 		//Left click
 		// console.log('Left click at '+clickedRow+", "+clickedCol);
 
-		//Check for a flag already being here
+		//Check for a value already being here
 		if (clickedBtn.innerHTML == "") {
-			//If there is not a flag, we can take action
+			//If there is not anything already there, we can take action
 
 			//Check for Lose
 			if (board[clickedRow][clickedCol].mine) {
-				clickedBtn.className += " text5";
+				clickedBtn.className += " textM";
 				loseEndGame();
 			}
 
@@ -261,7 +281,7 @@ function play(ele, event) {
 			if (board[clickedRow][clickedCol].value > 0) {
 				clickedBtn.className += " pressed text" + board[clickedRow][clickedCol].value;
 				clickedBtn.innerHTML = board[clickedRow][clickedCol].value;
-				board[clickedRow][clickedCol].visited = true;
+				board[clickedRow][clickedCol].checked = true;
 			}
 		}
 	}
@@ -272,14 +292,14 @@ function play(ele, event) {
 		//Switch through empty, F, and ?
 		if (!clickedBtn.classList.contains('pressed')) {
 			if (clickedBtn.innerHTML == "") {
-				clickedBtn.innerHTML = "F";
+				clickedBtn.innerHTML = flagChar;
 				clickedBtn.className = "gameBoardBtn textF"
 			}
-			else if (clickedBtn.innerHTML == "F") {
-				clickedBtn.innerHTML = "?";
+			else if (clickedBtn.innerHTML == flagChar) {
+				clickedBtn.innerHTML = quesChar;
 				clickedBtn.className = "gameBoardBtn textQ"
 			}
-			else if (clickedBtn.innerHTML == "?") {
+			else if (clickedBtn.innerHTML == quesChar) {
 				clickedBtn.innerHTML = "";
 				clickedBtn.className = "gameBoardBtn"
 			}
@@ -294,16 +314,16 @@ function play(ele, event) {
 
 function start() {
 	//pull in generation information
-	totalRows = document.getElementById("rows").value;
-	totalCols = document.getElementById("cols").value;
-	totalMines = document.getElementById("mines").value;
+	totalRows = parseInt(document.getElementById("rows").value);
+	totalCols = parseInt(document.getElementById("cols").value);
+	totalMines = parseInt(document.getElementById("mines").value);
 
-	document.getElementById("mines").max = totalRows * totalCols;
+	document.getElementById("mines").max = totalRows*totalCols-1;
+
+	generatedBoard = false;	//Set this to false so that the board will regenerated
 
 	if (isValid()) {
 		flagsLeft = totalMines;
-
-		generateBoard();
 		generateDisplay();
 		resetTimer();
 	}
@@ -315,7 +335,7 @@ function updateFlagCount() {
 	for (var i = 0; i < totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
 			var c = document.getElementById('btn_' + i + '_' + j);
-			if (c.innerHTML == 'F' || (c.innerHTML == '*' && !c.classList.contains('exploded')))
+			if (c.innerHTML == flagChar || (c.innerHTML == mineChar && !c.classList.contains('exploded')))
 				foundFlags++;
 		}
 	}
