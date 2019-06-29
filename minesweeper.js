@@ -45,7 +45,7 @@ function disableBoard() {
 			var curBtn = document.getElementById('btn_' + i + '_' + j);
 
 			//Disable the button
-			curBtn.disabled = true;
+			curBtn.className += " disabled";
 		}
 	}
 }
@@ -81,13 +81,13 @@ function expandEmptySpace() {
 
 	//Display the value
 	if (parseInt(board[r][c].value) > 0) {
-		document.getElementById('btn_' + r + '_' + c).value = board[r][c].value;
+		document.getElementById('btn_' + r + '_' + c).innerHTML = board[r][c].value;
 		document.getElementById('btn_' + r + '_' + c).className += " text" + board[r][c].value;
 	}
 
 	if (board[r][c].value == 0) {
 		//Reset the value, just in case a flag exists
-		document.getElementById('btn_' + r + '_' + c).value = "";
+		document.getElementById('btn_' + r + '_' + c).innerHTML = "";
 
 		//We want to check all of the neighbors as well
 		if (!isUndefined(board, r + 1, c) && !board[r + 1][c].checked) { toCheck.push({ row: r + 1, col: c }); board[r + 1][c].checked = true; }
@@ -171,7 +171,11 @@ function generateDisplay() {
 		rowDiv.className = "gameBoardRow";
 
 		for (var j = 0; j < totalCols; j++) {
-			rowDiv.innerHTML += "<input type='button' class='gameBoardBtn' id='btn_" + i + "_" + j + "' row='" + i + "' col='" + j + "' onclick='play(this, event)' oncontextmenu='play(this, event)'>"
+			//Create a button for the individual cell
+			//rowDiv.innerHTML += "<input type='button' class='gameBoardBtn' id='btn_" + i + "_" + j + "' row='" + i + "' col='" + j + "' onclick='play(this, event)' oncontextmenu='play(this, event)'>";
+
+			//Create div for the individual cell
+			rowDiv.innerHTML += "<div class='gameBoardBtn' id='btn_" + i + "_" + j + "' row='" + i + "' col='" + j + "' onclick='play(this, event)' oncontextmenu='play(this, event)'></div>";
 		}
 		boardDiv.appendChild(rowDiv);
 	}
@@ -212,14 +216,14 @@ function loseEndGame() {
 			var curBtn = document.getElementById('btn_' + i + '_' + j);
 
 			//Explode the unmarked mines
-			if (board[i][j].mine && curBtn.value != 'F') {
-				curBtn.value = "*";
+			if (board[i][j].mine && curBtn.innerHTML != 'F') {
+				curBtn.innerHTML = "*";
 				curBtn.className += " exploded";
 			}
 
 			//X out the incorrect flags
-			if (!board[i][j].mine && curBtn.value == 'F') {
-				curBtn.value = "x";
+			if (!board[i][j].mine && curBtn.innerHTML == 'F') {
+				curBtn.innerHTML = "x";
 			}
 		}
 	}
@@ -238,7 +242,7 @@ function play(ele, event) {
 		// console.log('Left click at '+clickedRow+", "+clickedCol);
 
 		//Check for a flag already being here
-		if (clickedBtn.value == "") {
+		if (clickedBtn.innerHTML == "") {
 			//If there is not a flag, we can take action
 
 			//Check for Lose
@@ -259,7 +263,7 @@ function play(ele, event) {
 			//Check if number
 			if (board[clickedRow][clickedCol].value > 0) {
 				clickedBtn.className += " pressed text" + board[clickedRow][clickedCol].value;
-				clickedBtn.value = board[clickedRow][clickedCol].value;
+				clickedBtn.innerHTML = board[clickedRow][clickedCol].value;
 				board[clickedRow][clickedCol].visited = true;
 			}
 		}
@@ -269,19 +273,17 @@ function play(ele, event) {
 		// console.log('Right click at '+clickedRow+", "+clickedCol);
 
 		//Switch through empty, F, and ?
-		// clickedBtn.value = clickedBtn.value == "" ? "F" : clickedBtn.value == "F" ? "?" : "";
-
 		if (!clickedBtn.classList.contains('pressed')) {
-			if (clickedBtn.value == "") {
-				clickedBtn.value = "F";
+			if (clickedBtn.innerHTML == "") {
+				clickedBtn.innerHTML = "F";
 				clickedBtn.className = "gameBoardBtn textF"
 			}
-			else if (clickedBtn.value == "F") {
-				clickedBtn.value = "?";
+			else if (clickedBtn.innerHTML == "F") {
+				clickedBtn.innerHTML = "?";
 				clickedBtn.className = "gameBoardBtn textQ"
 			}
-			else if (clickedBtn.value == "?") {
-				clickedBtn.value = "";
+			else if (clickedBtn.innerHTML == "?") {
+				clickedBtn.innerHTML = "";
 				clickedBtn.className = "gameBoardBtn"
 			}
 		}

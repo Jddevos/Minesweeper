@@ -16,12 +16,16 @@ button {
 }
 
 /* CLASSES */
+.disabled {
+	pointer-events: none;
+}
 .exploded {
 	background-color: darkred;
 	color: white;
 	border: darkred;
-	border-style: inset;
-	border-color: red;
+	/* border-style: inset;
+	border-color: red; */
+	border-width: 1px;
 }
 .flagged {
 	color: red;
@@ -29,13 +33,16 @@ button {
 .gameBoardBtn {
 	font-size: 100%;
 	border-radius: 0;
+	border: 1px solid darkgray;
 	width: 25px;
 	height: 25px;
-	font-weight: bold;
+	font-weight: normal;
 	text-align: center;
-	line-height: 0;
 	overflow: hidden;
 	display: inline-block;
+	margin: -1px;
+	padding: -1px;
+	position: static;
 }
 .gameBoardRow {
 	height: 25px;
@@ -58,11 +65,12 @@ button {
 .inputTextSpan {
 	float: right;
 }
- .pressed {
+.pressed {
 	margin: 0;
 	padding: 0;
 	background-color: darkgray;
-	border: none;
+	width: 25px;
+	height: 25px;
 }
 .remainingFlags {
 	float: right;
