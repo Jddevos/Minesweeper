@@ -54,8 +54,8 @@ function displayMines() {
 	for (var i = 0; i < totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
 			var cur = document.getElementById('btn_' + i + '_' + j);
-			if (!cur.classList.contains('pressed') && cur.value == "" && board[i][j].mine) {
-				cur.value = "*";
+			if (!cur.classList.contains('pressed') && cur.innerHTML == "" && board[i][j].mine) {
+				cur.innerHTML = "*";
 				cur.classList.add('textB');
 			}
 		}
