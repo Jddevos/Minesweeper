@@ -171,9 +171,6 @@ function generateDisplay() {
 		rowDiv.className = "gameBoardRow";
 
 		for (var j = 0; j < totalCols; j++) {
-			//Create a button for the individual cell
-			//rowDiv.innerHTML += "<input type='button' class='gameBoardBtn' id='btn_" + i + "_" + j + "' row='" + i + "' col='" + j + "' onclick='play(this, event)' oncontextmenu='play(this, event)'>";
-
 			//Create div for the individual cell
 			rowDiv.innerHTML += "<div class='gameBoardBtn' id='btn_" + i + "_" + j + "' row='" + i + "' col='" + j + "' onclick='play(this, event)' oncontextmenu='play(this, event)'></div>";
 		}
