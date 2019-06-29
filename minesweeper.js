@@ -315,7 +315,7 @@ function updateFlagCount() {
 	for (var i = 0; i < totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
 			var c = document.getElementById('btn_' + i + '_' + j);
-			if (c.value == 'F' || (c.value == '*' && !c.classList.contains('exploded')))
+			if (c.innerHTML == 'F' || (c.innerHTML == '*' && !c.classList.contains('exploded')))
 				foundFlags++;
 		}
 	}

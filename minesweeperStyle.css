@@ -66,8 +66,6 @@ button {
 	float: right;
 }
 .pressed {
-	margin: 0;
-	padding: 0;
 	background-color: darkgray;
 	width: 25px;
 	height: 25px;
