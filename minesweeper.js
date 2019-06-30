@@ -23,7 +23,7 @@ function checkWin() {
 				//We dont want to count pressed or exploded cells
 				unpressedCells++;
 			}
-			else if (cur.value == 'F') {
+			else if (cur.value == flagChar) {
 				//This is unnecessary, as flagged cells will not be pressed. Including for completionism
 				unpressedCells++;
 			}
@@ -35,9 +35,9 @@ function checkWin() {
 	if (unpressedCells == totalMines && document.querySelector('.exploded') == null) {
 		pauseTimer();
 
-		disableBoard();
 		displayMines();
 		updateFlagCount();
+		disableBoard();
 
 		window.alert('You won!');
 	}
@@ -52,6 +52,9 @@ function disableBoard() {
 			curBtn.className += " disabled";
 		}
 	}
+
+	//clear the board variable
+	board = new Array();
 }
 
 function displayMines() {
@@ -109,6 +112,7 @@ function expandEmptySpace() {
 
 function generateBoard(initClick) {
 	//Parameters are the initial click. We need to avoid generating mines there
+	// console.log("initClick: " +initClick);
 
 	//Clear the board
 	board = new Array();
@@ -129,8 +133,8 @@ function generateBoard(initClick) {
 			r = Math.floor(Math.random() * totalRows)
 			c = Math.floor(Math.random() * totalCols)
 			// console.log("Checking " +r+ ", " +c);
-		} while (board[r][c].mine == true && r*totalRows+c != initClick)
-		//This while calculation ensures that the initial click isnt a mine
+		} while (board[r][c].mine == true || r*totalRows+c == initClick)
+		//This while calculation ensures that the initial click isnt a mine and that mines arent repeated
 
 		// console.log("Placing mine at " +r+ ", " +c)
 		board[r][c].mine = true;
@@ -240,16 +244,17 @@ function loseEndGame() {
 }
 
 function play(ele, event) {
-	var clickedRow = ele.getAttribute('row');
-	var clickedCol = ele.getAttribute('col')
+	var clickedRow = Math.round(ele.getAttribute('row'));
+	var clickedCol = Math.round(ele.getAttribute('col'));
 	var clickedBtn = document.getElementById('btn_' + clickedRow + '_' + clickedCol);
 
 	// console.log("row: "+clickedRow+", col: "+clickedCol);
 
 	//We need to generate the board if it doesnt already exist
 	if (!generatedBoard) {
-		// console.log("Num: "+clickedRow*totalRows+clickedCol);
-		generateBoard(clickedRow*totalRows+clickedCol);
+		var initCell = Math.round(clickedRow*totalRows+clickedCol);
+		// console.log("Num: "+initCell);
+		generateBoard(initCell);
 	}
 
 	startTimer(); //Start the timer, if it isnt already
@@ -266,6 +271,7 @@ function play(ele, event) {
 			if (board[clickedRow][clickedCol].mine) {
 				clickedBtn.className += " textM";
 				loseEndGame();
+				return;
 			}
 
 			//Check if blank
@@ -342,5 +348,5 @@ function updateFlagCount() {
 
 	var flagsLeft = totalMines - foundFlags;
 
-	document.getElementById('remainingFlags').innerHTML = flagsLeft < 0 ? 0 : flagsLeft;
+	document.getElementById('remainingFlags').innerHTML = flagsLeft;
 }
