@@ -47,6 +47,11 @@ function checkWin() {
 
 		// window.alert('You won!');
 		document.getElementById("alertPanel").innerHTML = 'You won!';
+
+		//Set btn to appropriate face
+		if (boardSize == "sm") {setBtn(128578);}
+		if (boardSize == "md") {setBtn(128522);}
+		if (boardSize == "lg") {setBtn(129321);}
 	}
 }
 
@@ -174,30 +179,29 @@ function generateDisplay() {
 
 	//Generate info panel
 	infoDiv = document.createElement('div');
-	timerDiv = document.createElement('div');
-	resetDiv = document.createElement('div');
-	flagsDiv = document.createElement('div');
-
-
 	infoDiv.id = "infoContainer";
-
+	
+	timerDiv = document.createElement('div');
 	timerDiv.id = "timer";
 	timerDiv.className = "timer";
 	timerDiv.innerHTML = "00:00:00";
-	
-	resetDiv.id = "smileBtn"
-	resetDiv.className = "smileBtn";
-	resetDiv.innerHTML = "<input type='Button' value='&#128512' onclick='start()'>"
-
-	flagsDiv.id = "remainingFlags";
-	flagsDiv.className = "remainingFlags";
-	flagsDiv.innerHTML = totalMines;
-
 	infoDiv.appendChild(timerDiv);
+
+	resetDiv = document.createElement('div');
+	resetDiv.id = "resetDiv"
+	resetDiv.className = "resetDiv";
+	//Initial innerHTML contents are set below, in the call to setBtn
 	infoDiv.appendChild(resetDiv);
+
+	flagsDiv = document.createElement('div');
+	flagsDiv.id = "flagsDiv";
+	flagsDiv.className = "flagsDiv";
+	flagsDiv.innerHTML = totalMines;
 	infoDiv.appendChild(flagsDiv);
 
 	boardDiv.appendChild(infoDiv);	//Append to boardDiv
+	
+	setBtn(128528);	//Set resetDiv to contain the neutral face
 
 	//Generate cells
 	for (var i = 0; i < totalRows; i++) {
@@ -266,12 +270,17 @@ function loseEndGame() {
 	}
 	disableBoard();
 
+	setBtn(129327);	//Exploded head
 	alertPanel.innerHTML = 'You lost.';
+}
+
+function setBtn(emojiCode) {
+	document.getElementById("resetDiv").innerHTML = "<input type='Button' id='resetBtn' value='&#"+emojiCode+"' onclick='start()'>";
 }
 
 function setSize() {
 	boardSize = document.querySelector('input[name="size"]:checked').value;
-	
+
 	switch(boardSize) {
 		case "sm":
 			totalRows = sm.rows;
@@ -316,6 +325,8 @@ function play(ele, event) {
 		//Left click
 		// console.log('Left click at '+clickedRow+", "+clickedCol);
 
+		setBtn(128528);	//Reset face to neutral
+
 		//Check for a value already being here
 		if (clickedBtn.innerHTML == "") {
 			//If there is not anything already there, we can take action
@@ -353,14 +364,17 @@ function play(ele, event) {
 			if (clickedBtn.innerHTML == "") {
 				clickedBtn.innerHTML = flagChar;
 				clickedBtn.className = "gameBoardBtn textF"
+				setBtn(128681);	//Flag emoji
 			}
 			else if (clickedBtn.innerHTML == flagChar) {
 				clickedBtn.innerHTML = quesChar;
 				clickedBtn.className = "gameBoardBtn textQ"
+				setBtn(129300);	//Thinking face
 			}
 			else if (clickedBtn.innerHTML == quesChar) {
 				clickedBtn.innerHTML = "";
 				clickedBtn.className = "gameBoardBtn"
+				setBtn(128528);	//Reset to neutral
 			}
 		}
 	}
@@ -400,5 +414,5 @@ function updateFlagCount() {
 
 	var flagsLeft = totalMines - foundFlags;
 
-	document.getElementById('remainingFlags').innerHTML = flagsLeft;
+	document.getElementById('flagsDiv').innerHTML = flagsLeft;
 }

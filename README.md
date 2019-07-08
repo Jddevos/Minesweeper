@@ -6,7 +6,6 @@ An HTML/JS game of minesweeper
 
 #### To-Do
 - Custom size options
-- Reset button dynamically changing
 - Local high scores
 - Styling?
 - Organize code :/
@@ -23,3 +22,4 @@ An HTML/JS game of minesweeper
 - Resolved spacing issues in Chrome
 - Remove the possiblity of clicking a mine on the first turn
 - Preset board size options
+- Reset button dynamically changes

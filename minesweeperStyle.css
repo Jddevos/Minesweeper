@@ -92,13 +92,13 @@ html {
 	float: left;
 	text-align: left;
 }
-.smileBtn {
+.resetDiv {
 	margin: auto;
 	text-align: center;
 	width: 40%;
 	text-align: center;
 }
-.remainingFlags {
+.flagsDiv {
 	margin: auto;
 	width: 30%;
 	float: right;
