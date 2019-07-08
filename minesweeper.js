@@ -29,7 +29,6 @@ function checkWin() {
 			}
 		}
 	}
-
 	// console.log(unpressedCells+ ' unpressed cells remaining');
 
 	if (unpressedCells == totalMines && document.querySelector('.exploded') == null) {
@@ -39,7 +38,8 @@ function checkWin() {
 		updateFlagCount();
 		disableBoard();
 
-		window.alert('You won!');
+		// window.alert('You won!');
+		document.getElementById('alertPanel').innerHTML = 'You won!';
 	}
 }
 
@@ -203,9 +203,9 @@ function isUndefined(_arr, _index1, _index2) {
 function isValid() {
 	//Check validity of input
 	var valid = true;
-	var alertPanel = document.getElementById('alertPanel').innerHTML;
+	var alertPanel = document.getElementById('alertPanel');
 
-	alertPanel = "";
+	alertPanel.innerHTML = '';
 
 	if (totalRows < 5 || totalRows > 35) {
 		valid = false;
@@ -221,6 +221,8 @@ function isValid() {
 }
 
 function loseEndGame() {
+	var alertPanel = document.getElementById('alertPanel');
+
 	pauseTimer();
 	for (var i = 0; i < totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
@@ -241,6 +243,8 @@ function loseEndGame() {
 		}
 	}
 	disableBoard();
+
+	alertPanel.innerHTML = 'You lost.';
 }
 
 function play(ele, event) {
