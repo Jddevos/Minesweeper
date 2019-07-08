@@ -17,10 +17,7 @@ html {
 	display: inline-block;
 	border: 2px solid black;
 }
-#infoContainer {
-	font-family: 'Courier New', Courier, monospace;
-	border-bottom: 2px solid black;
-}
+
 
 /* CLASSES */
 .disabled {
@@ -30,8 +27,6 @@ html {
 	background-color: darkred;
 	color: white;
 	border: darkred;
-	/* border-style: inset;
-	border-color: red; */
 	border-width: 1px;
 }
 .flagged {
@@ -79,10 +74,40 @@ html {
 	width: 25px;
 	height: 25px;
 }
-.remainingFlags {
-	float: right;
+
+
+/* INFO CONTAINER */
+#infoContainer {
+	font-family: 'Courier New', Courier, monospace;
+	border-bottom: 2px solid black;
+	color: #000;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
 }
- .textQ {
+.timer {
+	margin: auto;
+	width: 30%;
+	float: left;
+	text-align: left;
+}
+.smileBtn {
+	margin: auto;
+	text-align: center;
+	width: 40%;
+	text-align: center;
+}
+.remainingFlags {
+	margin: auto;
+	width: 30%;
+	float: right;
+	text-align: right;
+}
+
+
+/* TEXT COLOR */
+.textQ {
 	color: orange;
 }
 .textF {
@@ -117,7 +142,4 @@ html {
 }
 .text8 {
 	color: turquoise;
-}
-.timer {
-	color: #000;
 }

@@ -1,4 +1,4 @@
-
+//Basic idea for storing high schores
 
 function storageAvailable(type) {
 	var storage;

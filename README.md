@@ -5,9 +5,16 @@ An HTML/JS game of minesweeper
 
 
 #### To-Do
-- Cookie-based local high scores
-- Preset board size options
-- Styling
+- Custom size options
+- Reset button dynamically changing
+- Local high scores
+- Styling?
+- Organize code :/
+- More comments
+- Settings
+    - Flag, mine, and question character selection
+    - Accuracy of timer
+    - Colors?
 
 
 
@@ -15,3 +22,4 @@ An HTML/JS game of minesweeper
 - Remove ability to click on flagged mine without removing flag
 - Resolved spacing issues in Chrome
 - Remove the possiblity of clicking a mine on the first turn
+- Preset board size options

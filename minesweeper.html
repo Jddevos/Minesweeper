@@ -2,35 +2,33 @@
 <html lang="en">
 	<meta charset="UTF-8">
 	<head>
+		<title>Minesweeper</title>
 		<link rel="stylesheet" href="minesweeperStyle.css" />
 		<script src="minesweeper.js"></script>
 		<script src="storage.js"></script>
 	</head>
 	<body onload="start()">
-		<form autocomplete="off">
-			<div class="inputArea">
+		<!-- <div class="inputArea">
 				<span class="inputLabelSpan">Rows:</span>
-				<input type="number" name="rows" id="rows" min="5" max="35" value="9" class="inputNumber">
+				<input type="number" name="rows" id="rows" min="6" max="24" value="9" class="inputNumber">
 			</div>
 			<div class="inputArea">
 				<span class="inputLabelSpan">Columns:</span>
-				<input type="number" name="cols" id="cols" min="5" max="75" value="9" class="inputNumber">
+				<input type="number" name="cols" id="cols" min="6" max="30" value="9" class="inputNumber">
 			</div>
 			<div class="inputArea">
 				<span class="inputLabelSpan">Mines:</span>
-				<input type="number" name="mines" id="mines" min="0" max="100" value="10" class="inputNumber">
-			</div>
-			<br />
-			<input type="button" value="Generate" onclick="start()">
+				<input type="number" name="mines" id="mines" min="1" max="200" value="10" class="inputNumber">
+			</div> -->
+		<form>
+			S:<input type="radio" name="size" value="sm" onchange="start()" checked>
+			M:<input type="radio" name="size" value="md" onchange="start()">
+			L:<input type="radio" name="size" value="lg" onchange="start()">
+			<!-- C:<input type="radio" name="size" value="cu" onchange="start()"> -->
 		</form>
 		<br />
-
-		<div id="board">
-		</div>
-
-		<div id="alertPanel">
-		</div>
-
+		<div id="board"></div>
+		<div id="alertPanel"></div>
 		<script src="timer.js"></script>
 	</body>
 </html>

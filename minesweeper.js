@@ -1,12 +1,19 @@
+/* Global variables */
 var board = new Array();	//This will hold the game board in its entirety
 var toCheck = new Array();	//Will hold the list of cells to check when expanding empty space
-var totalRows = 0;
-var totalCols = 0;
-var totalMines = 0;
-var generatedBoard = false;
+var totalRows = 0;	//Total number of rows
+var totalCols = 0;	//Total number of columns
+var totalMines = 0;	//Total number of mines
+var generatedBoard = false;	//Has the board been generated yet?
 var mineChar = "O";	//Character to display to indicate a mine
 var flagChar = "F";	//Character to display to indicate a flag
 var quesChar = "?";	//Character to display to indicate a question
+var boardSize = "sm";	//The size of the board
+
+/* Board sizes */
+var sm = {rows: 8, cols: 8, mines: 10};
+var md = {rows: 16, cols: 16, mines: 40};
+var lg = {rows: 16, cols: 30, mines: 99};
 
 document.oncontextmenu = function () {
 	//This disables the right click context menu
@@ -39,8 +46,12 @@ function checkWin() {
 		disableBoard();
 
 		// window.alert('You won!');
-		document.getElementById('alertPanel').innerHTML = 'You won!';
+		document.getElementById("alertPanel").innerHTML = 'You won!';
 	}
+}
+
+function clearAlerts() {
+	document.getElementById("alertPanel").innerHTML = "";
 }
 
 function disableBoard() {
@@ -163,19 +174,28 @@ function generateDisplay() {
 
 	//Generate info panel
 	infoDiv = document.createElement('div');
-	timerSpan = document.createElement('span');
-	flagsSpan = document.createElement('span');
+	timerDiv = document.createElement('div');
+	resetDiv = document.createElement('div');
+	flagsDiv = document.createElement('div');
+
 
 	infoDiv.id = "infoContainer";
-	timerSpan.className = "timer";
-	timerSpan.id = "timer";
-	timerSpan.innerHTML = "00:00:000";
-	flagsSpan.className = "remainingFlags";
-	flagsSpan.id = "remainingFlags";
-	flagsSpan.innerHTML = "flags left";
 
-	infoDiv.appendChild(timerSpan);
-	infoDiv.appendChild(flagsSpan);
+	timerDiv.id = "timer";
+	timerDiv.className = "timer";
+	timerDiv.innerHTML = "00:00:00";
+	
+	resetDiv.id = "smileBtn"
+	resetDiv.className = "smileBtn";
+	resetDiv.innerHTML = "<input type='Button' value='&#128512' onclick='start()'>"
+
+	flagsDiv.id = "remainingFlags";
+	flagsDiv.className = "remainingFlags";
+	flagsDiv.innerHTML = totalMines;
+
+	infoDiv.appendChild(timerDiv);
+	infoDiv.appendChild(resetDiv);
+	infoDiv.appendChild(flagsDiv);
 
 	boardDiv.appendChild(infoDiv);	//Append to boardDiv
 
@@ -203,25 +223,27 @@ function isUndefined(_arr, _index1, _index2) {
 function isValid() {
 	//Check validity of input
 	var valid = true;
-	var alertPanel = document.getElementById('alertPanel');
+	var alertPanel = document.getElementById("alertPanel");
 
-	alertPanel.innerHTML = '';
+	// //Clear alert panel
+	// alertPanel.innerHTML = '';
 
-	if (totalRows < 5 || totalRows > 35) {
-		valid = false;
-	}
-	else if (totalCols < 5 || totalCols > 75) {
-		valid = false;
-	}
-	else if (totalMines < 1 || totalMines > totalRows*totalCols-1) {
-		valid = false;
-	}
+	// if (totalRows < document.getElementById('rows').min || totalRows > document.getElementById('rows').max) {
+	// 	valid = false;
+	// }
+	// else if (totalCols < document.getElementById('cols').min || totalCols > document.getElementById('cols').max) {
+	// 	valid = false;
+	// }
+	// //
+	// else if (totalMines < document.getElementById('mines').min || totalMines > totalRows*totalCols-1) {
+	// 	valid = false;
+	// }
 
 	return valid;
 }
 
 function loseEndGame() {
-	var alertPanel = document.getElementById('alertPanel');
+	var alertPanel = document.getElementById("alertPanel");
 
 	pauseTimer();
 	for (var i = 0; i < totalRows; i++) {
@@ -245,6 +267,33 @@ function loseEndGame() {
 	disableBoard();
 
 	alertPanel.innerHTML = 'You lost.';
+}
+
+function setSize() {
+	boardSize = document.querySelector('input[name="size"]:checked').value;
+	
+	switch(boardSize) {
+		case "sm":
+			totalRows = sm.rows;
+			totalCols = sm.cols;
+			totalMines =  sm.mines;
+			break;
+		case "md":
+			totalRows = md.rows;
+			totalCols = md.cols;
+			totalMines =  md.mines;
+			break;
+		case "lg":
+			totalRows = lg.rows;
+			totalCols = lg.cols;
+			totalMines =  lg.mines;
+			break;
+		default:
+			document.getElementById("alertPanel").innerHTML = "An error has occurred in board size selection. Defaulting to small board.";
+			totalRows = sm.rows;
+			totalCols = sm.cols;
+			totalMines =  sm.mines;
+	}
 }
 
 function play(ele, event) {
@@ -323,14 +372,13 @@ function play(ele, event) {
 }
 
 function start() {
-	//pull in generation information
-	totalRows = parseInt(document.getElementById("rows").value);
-	totalCols = parseInt(document.getElementById("cols").value);
-	totalMines = parseInt(document.getElementById("mines").value);
+	//Clear any alerts
+	clearAlerts();
 
-	document.getElementById("mines").max = totalRows*totalCols-1;
-
-	generatedBoard = false;	//Set this to false so that the board will regenerated
+	//Set the total variables
+	setSize();
+	
+	generatedBoard = false;	//Set this to false so that the board will be regenerated
 
 	if (isValid()) {
 		flagsLeft = totalMines;
