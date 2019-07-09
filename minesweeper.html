@@ -8,29 +8,17 @@
 		<script src="storage.js"></script>
 	</head>
 	<body onload="start()">
-		
-		<form>
-			S:<input type="radio" name="size" value="sm" onchange="start()" checked="true">
+		<form autocomplete="off" id="settings">
+			S:<input type="radio" name="size" value="sm" onchange="start()" checked="checked">
 			M:<input type="radio" name="size" value="md" onchange="start()">
 			L:<input type="radio" name="size" value="lg" onchange="start()">
 			X:<input type="radio" name="size" value="xl" onchange="start()">
 			C:<input type="radio" name="size" value="cu" onchange="start()">
-			<br />
-			<div class="inputArea">
-				<span class="inputLabelSpan">Rows:</span>
-				<input type="number" name="rows" id="rows" min="6" max="24" value="9" class="inputNumber">
-			</div>
-			<div class="inputArea">
-				<span class="inputLabelSpan">Columns:</span>
-				<input type="number" name="cols" id="cols" min="6" max="30" value="9" class="inputNumber">
-			</div>
-			<div class="inputArea">
-				<span class="inputLabelSpan">Mines:</span>
-				<input type="number" name="mines" id="mines" min="1" max="200" value="10" class="inputNumber">
-			</div>
-			<br />
+			<span>&#124;&#124;</span>
+			R:<input type="number" name="rows" id="rows" min="8" max="24" value="9" class="inputNumber">
+			C:<input type="number" name="cols" id="cols" min="8" max="30" value="9" class="inputNumber">
+			M:<input type="number" name="mines" id="mines" min="8" max="225" value="10" class="inputNumber">
 		</form>
-		
 		<div id="board"></div>
 		<div id="alertPanel"></div>
 		<script src="timer.js"></script>

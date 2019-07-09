@@ -127,22 +127,43 @@ function start() {
 	boardSize = document.querySelector('input[name="size"]:checked').value;
 
 	if (boardSize.toString() == 'cu') {
+		//We need to make the input areas editable
+		document.getElementById("rows").readOnly = false;
+		document.getElementById("cols").readOnly = false;
+		document.getElementById("mines").readOnly = false;
+
+		//Set the totalRows, totalCols, and totalMines variables
+		totalRows = parseInt(document.getElementById("rows").value, 10);
+		totalCols = parseInt(document.getElementById("cols").value, 10);
+		totalMines = parseInt(document.getElementById("mines").value, 10);
+	}
+	else {
+		//We need to make the input areas readOnly
+		document.getElementById("rows").readOnly = true;
+		document.getElementById("cols").readOnly = true;
+		document.getElementById("mines").readOnly = true;
+
+		//Set the totalRows, totalCols, and totalMines variables
+		totalRows = boardMap.get(boardSize.toString()).rows;
+		totalCols = boardMap.get(boardSize.toString()).cols;
+		totalMines = boardMap.get(boardSize.toString()).mines;
+
+		//Set the input boxes so that they match whatever the current selection is
 		document.getElementById("rows").value = totalRows;
 		document.getElementById("cols").value = totalCols;
 		document.getElementById("mines").value = totalMines;
 	}
-	else {
-		totalRows = boardMap.get(boardSize.toString()).rows;
-		totalCols = boardMap.get(boardSize.toString()).cols;
-		totalMines = boardMap.get(boardSize.toString()).mines;
-	}
 	
 	generatedBoard = false;	//Set this to false so that the board will be regenerated
 
-	if (isValid()) {
+	if (document.getElementById("settings").checkValidity()) {	//If everything is valid, proceed
 		flagsLeft = totalMines;
 		generateDisplay();
 		resetTimer();
+	}
+	else {	//If things are not valid, display an error
+		document.getElementById("alertPanel").innerHTML = "The supplied parameters were not valid.";
+		setBtn(128565);	//Dizzy Face
 	}
 }
 
@@ -379,35 +400,6 @@ function isUndefined(_arr, _index1, _index2) {
 	} catch (e) {
 		return true;
 	}
-}
-
-function isValid() {
-	clearAlerts();	//Clear alert panel
-
-	//If this is not a custom size, we know it is valid
-	if (boardSize.toString() != 'cu') {
-		return true;
-	}
-
-	//If this is a custom size, we need to verify the parameters are valid
-	var valid = true;
-
-	if (totalRows < document.getElementById('rows').min || totalRows > document.getElementById('rows').max) {
-		valid = false;
-	}
-	else if (totalCols < document.getElementById('cols').min || totalCols > document.getElementById('cols').max) {
-		valid = false;
-	}
-	//
-	else if (totalMines < document.getElementById('mines').min || totalMines > totalRows*totalCols-1) {
-		valid = false;
-	}
-
-	if (!valid) {
-		document.getElementById("alertPanel").innerHTML = "The supplied parameters were not valid.";
-		setBtn(128565);	//Dizzy Face
-	}
-	return valid;
 }
 
 function setBtn(emojiCode) {
