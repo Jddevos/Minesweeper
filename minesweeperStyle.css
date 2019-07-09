@@ -66,13 +66,13 @@ input[type=number]::-webkit-outer-spin-button {
 	/* border-left: 2px solid black; */
 	display: inline-block;
 }
-.inputNumber {
+.input {
 	height: 0.65rem;
-	width: 28px;
 	display: inline-block;
+	overflow: hidden;
 }
-.inputTextSpan {
-	float: right;
+.number {
+	width: 28px;
 }
 .pressed {
 	background-color: darkgray;

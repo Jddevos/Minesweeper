@@ -9,6 +9,7 @@ var generatedBoard = false;	//Has the board been generated yet?
 var btnValue = '\u{1f610}';	//Will hold the value of the reset button
 
 /* Display Characters */
+//Full list of emojis can be founs at https://unicode.org/emoji/charts-12.0/full-emoji-list.html
 var mineChar = "\u{1f4a3}";	//Character to display to indicate a mine
 var flagChar = "\u{1f6a9}";	//Character to display to indicate a flag
 var quesChar = "\u{2753}";	//Character to display to indicate a question
@@ -222,19 +223,19 @@ function leftClick(clickedRow, clickedCol, clickedCell) {
 function rightClick(clickedCell) {
 	//Switch through empty, F, and ?
 	if (!clickedCell.classList.contains('pressed')) {
-		if (clickedCell.innerHTML == "") {
+		if (clickedCell.innerHTML == "") {	//Cell is empty
 			clickedCell.innerHTML = flagChar;	//set cell to display the flag character
 			clickedCell.classList.add('textF');	//add the appropriate class
 			clickedCell.classList.remove('textQ');	//remove irrelevant classes
-			setBtn('\u{1f6a9}');	//display the Triangular Flag emoji on the reset button
+			setBtn('\u{1f630}');	//display the Anxious Face with Sweat emoji on the reset button
 		}
-		else if (clickedCell.innerHTML == flagChar) {
+		else if (clickedCell.innerHTML == flagChar) {	//Cell is a flag
 			clickedCell.innerHTML = quesChar;	//set cell to display the question character
 			clickedCell.classList.add('textQ');	//add the appropriate class
 			clickedCell.classList.remove('textF');	//remove irrelevant classes
 			setBtn('\u{1f914}');	//display the Thinking Face emoji on the reset button
 		}
-		else if (clickedCell.innerHTML == quesChar) {
+		else if (clickedCell.innerHTML == quesChar) {	//Cell is a question
 			clickedCell.innerHTML = "";	//set cell back to empty
 			clickedCell.classList.add();	//add the appropriate class
 			clickedCell.classList.remove('textF', 'textQ');	//remove irrelevant classes
@@ -305,13 +306,11 @@ function checkWin() {
 
 	for (var i = 0; i < totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
-			var cur = document.getElementById('cell_' + i + '_' + j);
-			if (!cur.classList.contains('pressed') && !cur.classList.contains('exploded')) {
-				//We dont want to count pressed or exploded cells
+			var cur = document.getElementById('cell_'+i+'_'+j);
+			if (!cur.classList.contains('pressed') && !cur.classList.contains('exploded')) {	//We dont want to count pressed or exploded cells
 				unpressedCells++;
 			}
-			else if (cur.value == flagChar) {
-				//This is unnecessary, as flagged cells will not be pressed. Including for completionism
+			else if (cur.value == flagChar) {	//This is unnecessary, as flagged cells will not be pressed. Including for completionism
 				unpressedCells++;
 			}
 		}
@@ -327,6 +326,8 @@ function checkWin() {
 
 		document.getElementById("alertPanel").innerHTML = 'You won!';	//Set alertPanel
 		setBtn(boardMap.get(boardSize.toString()).winFace);	//Set btn to appropriate face
+
+		//Attempt to add to leaderboard
 	}
 }
 function loseEndGame() {

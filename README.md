@@ -16,6 +16,7 @@ An HTML/JS game of minesweeper
 #### Bug Fixes
 - Code comments
 - Code standardization
+- Input numbers can scroll
 
 
 
