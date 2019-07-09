@@ -8,7 +8,15 @@
 		<script src="storage.js"></script>
 	</head>
 	<body onload="start()">
-		<!-- <div class="inputArea">
+		
+		<form>
+			S:<input type="radio" name="size" value="sm" onchange="start()" checked>
+			M:<input type="radio" name="size" value="md" onchange="start()">
+			L:<input type="radio" name="size" value="lg" onchange="start()">
+			X:<input type="radio" name="size" value="xl" onchange="start()">
+			C:<input type="radio" name="size" value="cu" onchange="start()">
+			<br />
+			<div class="inputArea">
 				<span class="inputLabelSpan">Rows:</span>
 				<input type="number" name="rows" id="rows" min="6" max="24" value="9" class="inputNumber">
 			</div>
@@ -19,14 +27,10 @@
 			<div class="inputArea">
 				<span class="inputLabelSpan">Mines:</span>
 				<input type="number" name="mines" id="mines" min="1" max="200" value="10" class="inputNumber">
-			</div> -->
-		<form>
-			S:<input type="radio" name="size" value="sm" onchange="start()" checked>
-			M:<input type="radio" name="size" value="md" onchange="start()">
-			L:<input type="radio" name="size" value="lg" onchange="start()">
-			<!-- C:<input type="radio" name="size" value="cu" onchange="start()"> -->
+			</div>
+			<br />
 		</form>
-		<br />
+		
 		<div id="board"></div>
 		<div id="alertPanel"></div>
 		<script src="timer.js"></script>
