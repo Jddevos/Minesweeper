@@ -4,7 +4,7 @@ An HTML/JS game of minesweeper
 
 
 
-#### Features
+#### Desired Features
 - Local high scores
 - Settings panel
     - Flag, mine, and question character selection
