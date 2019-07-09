@@ -11,10 +11,11 @@ var quesChar = "?";	//Character to display to indicate a question
 var boardSize = "sm";	//The size of the board
 
 /* Board sizes */
-var sm = {rows: 8, cols: 8, mines: 10, winFace: 128578};	//8x8_10
-var md = {rows: 16, cols: 16, mines: 40, winFace: 128522};	//16x16_40
-var lg = {rows: 16, cols: 30, mines: 99, winFace: 129321};	//16x30_99
-var xl = {rows: 24, cols: 30, mines: 225, winFace: 129321};	//24x30_225
+var sm = {rows: 8, cols: 8, mines: 10, winFace: 128578};	//8x8_10, Slightly Smiling Face
+var md = {rows: 16, cols: 16, mines: 40, winFace: 128522};	//16x16_40, Smiling Face With Smiling Eyes
+var lg = {rows: 16, cols: 30, mines: 99, winFace: 129321};	//16x30_99, Star-Struck
+var xl = {rows: 24, cols: 30, mines: 225, winFace: 129299};	//24x30_225, Nerd Face
+var cu = {rows: 8, cols: 8, mines: 10, winFace: 128566};	//Face Without Mouth
 
 /* Map of board sizes */
 var boardMap = new Map();
@@ -22,6 +23,7 @@ boardMap.set("sm", sm);
 boardMap.set("md", md);
 boardMap.set("lg", lg);
 boardMap.set("xl", xl);
+boardMap.set("cu", cu);
 
 document.oncontextmenu = function () {
 	//This disables the right click context menu
@@ -58,7 +60,7 @@ function generateDisplay() {
 
 	boardDiv.appendChild(infoDiv);	//Append to boardDiv
 	
-	setBtn(128528);	//Set resetDiv to contain the neutral face
+	setBtn(128528);	//Neutral Face
 
 	//Generate cells
 	for (var i = 0; i < totalRows; i++) {
@@ -165,7 +167,7 @@ function play(ele, event) {
 	if (event.type == 'click') {	//Left click
 		// console.log('Left click at '+clickedRow+", "+clickedCol);
 
-		setBtn(128528);	//Reset face to neutral
+		setBtn(128528);	//Neutral Face
 
 		//Check for a value already being here
 		if (clickedBtn.innerHTML == "") {
@@ -203,22 +205,79 @@ function play(ele, event) {
 			if (clickedBtn.innerHTML == "") {
 				clickedBtn.innerHTML = flagChar;
 				clickedBtn.className = "gameBoardBtn textF"
-				setBtn(128681);	//Flag emoji
+				setBtn(128681);	//Triangular Flag
 			}
 			else if (clickedBtn.innerHTML == flagChar) {
 				clickedBtn.innerHTML = quesChar;
 				clickedBtn.className = "gameBoardBtn textQ"
-				setBtn(129300);	//Thinking face
+				setBtn(129300);	//Thinking Face
 			}
 			else if (clickedBtn.innerHTML == quesChar) {
 				clickedBtn.innerHTML = "";
 				clickedBtn.className = "gameBoardBtn"
-				setBtn(128528);	//Reset to neutral
+				setBtn(128528);	//Neutral Face
 			}
 		}
 	}
 	updateFlagCount();
 	checkWin();	//Check for win
+}
+
+function expandEmptySpace() {
+	r = parseInt(toCheck[0].row, 10);
+	c = parseInt(toCheck[0].col, 10);
+
+	// console.log('r: ' + r);
+	// console.log('c: ' + c);	
+
+	//Dequeue the first element
+	toCheck.shift();
+
+	//Set the cell to checked
+	board[r][c].checked = true;
+
+
+	//Add the class
+	document.getElementById('btn_' + r + '_' + c).className += " pressed";
+
+	//Display the value
+	if (parseInt(board[r][c].value) > 0) {
+		document.getElementById('btn_' + r + '_' + c).innerHTML = board[r][c].value;
+		document.getElementById('btn_' + r + '_' + c).className += " text" + board[r][c].value;
+	}
+
+	if (board[r][c].value == 0) {
+		//Reset the value, just in case a flag exists
+		document.getElementById('btn_' + r + '_' + c).innerHTML = "";
+
+		//We want to check all of the neighbors as well
+		if (!isUndefined(board, r + 1, c) && !board[r + 1][c].checked) { toCheck.push({ row: r + 1, col: c }); board[r + 1][c].checked = true; }
+		if (!isUndefined(board, r - 1, c) && !board[r - 1][c].checked) { toCheck.push({ row: r - 1, col: c }); board[r - 1][c].checked = true; }
+		if (!isUndefined(board, r, c + 1) && !board[r][c + 1].checked) { toCheck.push({ row: r, col: c + 1 }); board[r][c + 1].checked = true; }
+		if (!isUndefined(board, r, c - 1) && !board[r][c - 1].checked) { toCheck.push({ row: r, col: c - 1 }); board[r][c - 1].checked = true; }
+		if (!isUndefined(board, r + 1, c + 1) && !board[r + 1][c + 1].checked) { toCheck.push({ row: r + 1, col: c + 1 }); board[r + 1][c + 1].checked = true; }
+		if (!isUndefined(board, r + 1, c - 1) && !board[r + 1][c - 1].checked) { toCheck.push({ row: r + 1, col: c - 1 }); board[r + 1][c - 1].checked = true; }
+		if (!isUndefined(board, r - 1, c + 1) && !board[r - 1][c + 1].checked) { toCheck.push({ row: r - 1, col: c + 1 }); board[r - 1][c + 1].checked = true; }
+		if (!isUndefined(board, r - 1, c - 1) && !board[r - 1][c - 1].checked) { toCheck.push({ row: r - 1, col: c - 1 }); board[r - 1][c - 1].checked = true; }
+	}
+	// console.log('Elements left to check: ' +toCheck.length);
+	// console.log(toCheck[0].row + ' ' + toCheck[0].col);
+}
+
+function updateFlagCount() {
+	var foundFlags = 0;
+
+	for (var i = 0; i < totalRows; i++) {
+		for (var j = 0; j < totalCols; j++) {
+			var c = document.getElementById('btn_' + i + '_' + j);
+			if (c.innerHTML == flagChar || (c.innerHTML == mineChar && !c.classList.contains('exploded')))
+				foundFlags++;
+		}
+	}
+
+	var flagsLeft = totalMines - foundFlags;
+
+	document.getElementById('flagsDiv').innerHTML = flagsLeft;
 }
 
 
@@ -277,7 +336,7 @@ function loseEndGame() {
 	}
 	disableBoard();
 
-	setBtn(129327);	//Exploded head
+	setBtn(129327);	//Exploding Head
 	alertPanel.innerHTML = 'You lost.';
 }
 
@@ -313,47 +372,6 @@ function displayMines() {
 	}
 }
 
-function expandEmptySpace() {
-	r = parseInt(toCheck[0].row, 10);
-	c = parseInt(toCheck[0].col, 10);
-
-	// console.log('r: ' + r);
-	// console.log('c: ' + c);	
-
-	//Dequeue the first element
-	toCheck.shift();
-
-	//Set the cell to checked
-	board[r][c].checked = true;
-
-
-	//Add the class
-	document.getElementById('btn_' + r + '_' + c).className += " pressed";
-
-	//Display the value
-	if (parseInt(board[r][c].value) > 0) {
-		document.getElementById('btn_' + r + '_' + c).innerHTML = board[r][c].value;
-		document.getElementById('btn_' + r + '_' + c).className += " text" + board[r][c].value;
-	}
-
-	if (board[r][c].value == 0) {
-		//Reset the value, just in case a flag exists
-		document.getElementById('btn_' + r + '_' + c).innerHTML = "";
-
-		//We want to check all of the neighbors as well
-		if (!isUndefined(board, r + 1, c) && !board[r + 1][c].checked) { toCheck.push({ row: r + 1, col: c }); board[r + 1][c].checked = true; }
-		if (!isUndefined(board, r - 1, c) && !board[r - 1][c].checked) { toCheck.push({ row: r - 1, col: c }); board[r - 1][c].checked = true; }
-		if (!isUndefined(board, r, c + 1) && !board[r][c + 1].checked) { toCheck.push({ row: r, col: c + 1 }); board[r][c + 1].checked = true; }
-		if (!isUndefined(board, r, c - 1) && !board[r][c - 1].checked) { toCheck.push({ row: r, col: c - 1 }); board[r][c - 1].checked = true; }
-		if (!isUndefined(board, r + 1, c + 1) && !board[r + 1][c + 1].checked) { toCheck.push({ row: r + 1, col: c + 1 }); board[r + 1][c + 1].checked = true; }
-		if (!isUndefined(board, r + 1, c - 1) && !board[r + 1][c - 1].checked) { toCheck.push({ row: r + 1, col: c - 1 }); board[r + 1][c - 1].checked = true; }
-		if (!isUndefined(board, r - 1, c + 1) && !board[r - 1][c + 1].checked) { toCheck.push({ row: r - 1, col: c + 1 }); board[r - 1][c + 1].checked = true; }
-		if (!isUndefined(board, r - 1, c - 1) && !board[r - 1][c - 1].checked) { toCheck.push({ row: r - 1, col: c - 1 }); board[r - 1][c - 1].checked = true; }
-	}
-	// console.log('Elements left to check: ' +toCheck.length);
-	// console.log(toCheck[0].row + ' ' + toCheck[0].col);
-}
-
 function isUndefined(_arr, _index1, _index2) {
 	//This function identifies whether the passed cell is valid
 	try {
@@ -387,27 +405,11 @@ function isValid() {
 
 	if (!valid) {
 		document.getElementById("alertPanel").innerHTML = "The supplied parameters were not valid.";
-		setBtn(128565);	//Set btn to a dizzy face
+		setBtn(128565);	//Dizzy Face
 	}
 	return valid;
 }
 
 function setBtn(emojiCode) {
 	document.getElementById("resetDiv").innerHTML = "<input type='Button' id='resetBtn' value='&#"+emojiCode+"' onclick='start()'>";
-}
-
-function updateFlagCount() {
-	var foundFlags = 0;
-
-	for (var i = 0; i < totalRows; i++) {
-		for (var j = 0; j < totalCols; j++) {
-			var c = document.getElementById('btn_' + i + '_' + j);
-			if (c.innerHTML == flagChar || (c.innerHTML == mineChar && !c.classList.contains('exploded')))
-				foundFlags++;
-		}
-	}
-
-	var flagsLeft = totalMines - foundFlags;
-
-	document.getElementById('flagsDiv').innerHTML = flagsLeft;
 }

@@ -4,16 +4,21 @@ An HTML/JS game of minesweeper
 
 
 
-#### To-Do
+#### Desired Features
 - Custom size options
 - Local high scores
-- Styling?
-- Organize code :/
-- More comments
-- Settings
+- Settings panel
     - Flag, mine, and question character selection
     - Accuracy of timer
     - Colors?
+
+
+
+#### Bug Fixes
+- Code comments
+- Things are wonky when flagChar is set to an emoji (&#128681)
+    - flagsDiv value not being properly set
+    - Character disappears when game is lost
 
 
 
