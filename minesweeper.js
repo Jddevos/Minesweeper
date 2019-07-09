@@ -3,12 +3,18 @@ var board = new Array();	//This will hold the game board in its entirety
 var toCheck = new Array();	//Will hold the list of cells to check when expanding empty space
 var totalRows = 0;	//Total number of rows
 var totalCols = 0;	//Total number of columns
-var totalMines = 0;	//Total number of mines
-var generatedBoard = false;	//Has the board been generated yet?
-var mineChar = "O";	//Character to display to indicate a mine
-var flagChar = "\u{1f6a9}";	//Character to display to indicate a flag
-var quesChar = "?";	//Character to display to indicate a question
+var totalMins = 0;	//Total number of mines
 var boardSize = "sm";	//The size of the board
+var generatedBoard = false;	//Has the board been generated yet?
+var btnValue = '\u{1f610}';	//Will hold the value of the reset button
+
+/* Display Characters */
+var mineChar = "\u{1f4a3}";	//Character to display to indicate a mine
+var flagChar = "\u{1f6a9}";	//Character to display to indicate a flag
+var quesChar = "\u{2753}";	//Character to display to indicate a question
+var wronChar = "\u{1f4a2}";	//Character to display when a flag is incorrect after losing
+var explChar = "\u{1f4a5}";	//Character to display when a mine is clicked
+
 
 /* Board sizes */
 var sm = {rows: 8, cols: 8, mines: 10, winFace: '\u{1f642}'};	//8x8_10, Slightly Smiling Face
@@ -26,10 +32,8 @@ boardMap.set("xl", xl);
 boardMap.set("cu", cu);
 
 document.oncontextmenu = function () {
-	//This disables the right click context menu
-	return false;
+	return false;	//This disables the right click context menu
 }
-
 
 /* Before the game starts */
 function generateDisplay() {
@@ -49,13 +53,13 @@ function generateDisplay() {
 	resetDiv = document.createElement('div');
 	resetDiv.id = "resetDiv"
 	resetDiv.className = "resetDiv";
-	resetDiv.innerHTML = "<input type='Button' id='resetBtn' value='\u{1f610}' onclick='start()'></input>";	//Neutral Face
+	resetDiv.innerHTML = "<input type='Button' id='resetBtn' value='\u{1f610}' onclick='rstBtn(this, event)' onmousedown='rstBtn(this, event)' onmouseleave='rstBtn(this, event)'/>";
 	infoDiv.appendChild(resetDiv);
 
 	flagsDiv = document.createElement('div');
 	flagsDiv.id = "flagsDiv";
 	flagsDiv.className = "flagsDiv";
-	flagsDiv.innerHTML = totalMines;
+	flagsDiv.innerHTML = totalMins;
 	infoDiv.appendChild(flagsDiv);
 
 	boardDiv.appendChild(infoDiv);	//Append to boardDiv
@@ -67,12 +71,11 @@ function generateDisplay() {
 
 		for (var j = 0; j < totalCols; j++) {
 			//Create div for the individual cell
-			rowDiv.innerHTML += "<div class='gameBoardBtn' id='btn_" + i + "_" + j + "' row='" + i + "' col='" + j + "' onclick='play(this, event)' oncontextmenu='play(this, event)'></div>";
+			rowDiv.innerHTML += "<div class='gameBoardBtn' id='cell_"+i+"_"+j+"' row='"+i+"' col='"+j+"' onclick='play(this, event)' oncontextmenu='play(this, event)'></div>";
 		}
 		boardDiv.appendChild(rowDiv);
 	}
 }
-
 function generateBoard(initClick) {
 	//Parameters are the initial click. We need to avoid generating mines there
 	// console.log("initClick: " +initClick);
@@ -89,7 +92,7 @@ function generateBoard(initClick) {
 		board.push(row);
 	}
 
-	for (var i = 0; i < totalMines; i++) {
+	for (var i = 0; i < totalMins; i++) {
 		//get random row and column
 		do {
 			r = Math.floor(Math.random() * totalRows)
@@ -113,51 +116,48 @@ function generateBoard(initClick) {
 		if (!isUndefined(board, r - 1, c - 1) && board[r - 1][c - 1].value != mineChar) { board[r - 1][c - 1].value++; }
 	}
 
-	
 	generatedBoard = true;	//Mark the board as generated
-
 	// console.log(board);
 }
-
 function start() {
 	clearAlerts();	//Clear any alerts
 
-	boardSize = document.querySelector('input[name="size"]:checked').value;
+	boardSize = document.querySelector('input[name="size"]:checked').value;	//pull the value out of the selected radio button
 
-	if (boardSize.toString() == 'cu') {
+	if (boardSize.toString() == 'cu') {	//custom size board
 		//We need to make the input areas editable
 		document.getElementById("rows").readOnly = false;
 		document.getElementById("cols").readOnly = false;
 		document.getElementById("mines").readOnly = false;
 
-		//Set the totalRows, totalCols, and totalMines variables
+		//Set the totalRows, totalCols, and totalMins variables
 		totalRows = parseInt(document.getElementById("rows").value, 10);
 		totalCols = parseInt(document.getElementById("cols").value, 10);
-		totalMines = parseInt(document.getElementById("mines").value, 10);
+		totalMins = parseInt(document.getElementById("mines").value, 10);
 	}
-	else {
+	else {	//standard size board
 		//We need to make the input areas readOnly
 		document.getElementById("rows").readOnly = true;
 		document.getElementById("cols").readOnly = true;
 		document.getElementById("mines").readOnly = true;
 
-		//Set the totalRows, totalCols, and totalMines variables
+		//Set the totalRows, totalCols, and totalMins variables
 		totalRows = boardMap.get(boardSize.toString()).rows;
 		totalCols = boardMap.get(boardSize.toString()).cols;
-		totalMines = boardMap.get(boardSize.toString()).mines;
+		totalMins = boardMap.get(boardSize.toString()).mines;
 
 		//Set the input boxes so that they match whatever the current selection is
 		document.getElementById("rows").value = totalRows;
 		document.getElementById("cols").value = totalCols;
-		document.getElementById("mines").value = totalMines;
+		document.getElementById("mines").value = totalMins;
 	}
 	
 	generatedBoard = false;	//Set this to false so that the board will be regenerated
 
 	if (document.getElementById("settings").checkValidity()) {	//If everything is valid, proceed
-		flagsLeft = totalMines;
-		generateDisplay();
-		resetTimer();
+		flagsLeft = totalMins;	//set the number of flags left
+		generateDisplay();	//redraw the board
+		resetTimer();	//reset timer to 0
 	}
 	else {	//If things are not valid, display an error
 		document.getElementById("alertPanel").innerHTML = "The supplied parameters were not valid.";
@@ -170,12 +170,11 @@ function start() {
 function play(ele, event) {
 	var clickedRow = Math.round(ele.getAttribute('row'));
 	var clickedCol = Math.round(ele.getAttribute('col'));
-	var clickedBtn = document.getElementById('btn_' + clickedRow + '_' + clickedCol);
+	var clickedCell = document.getElementById('cell_' + clickedRow + '_' + clickedCol);
 
 	// console.log("row: "+clickedRow+", col: "+clickedCol);
 
-	//We need to generate the board if it doesnt already exist
-	if (!generatedBoard) {
+	if (!generatedBoard) {	//We need to generate the board if it doesnt already exist
 		var initCell = Math.round(clickedRow*totalRows+clickedCol);
 		// console.log("Num: "+initCell);
 		generateBoard(initCell);
@@ -185,63 +184,64 @@ function play(ele, event) {
 
 	if (event.type == 'click') {	//Left click
 		// console.log('Left click at '+clickedRow+", "+clickedCol);
-
-		setBtn('\u{1f610}');	//Neutral Face
-
-		//Check for a value already being here
-		if (clickedBtn.innerHTML == "") {
-			//If there is not anything already there, we can take action
-
-			//Check for Lose
-			if (board[clickedRow][clickedCol].mine) {
-				clickedBtn.className += " textM";
-				loseEndGame();
-				return;
-			}
-
-			//Check if blank
-			if (board[clickedRow][clickedCol].value == 0) {
-				toCheck.push({ row: clickedRow, col: clickedCol });
-				//We want to set this button to pressed, and expand until we hit the edge or numbers
-				while (toCheck.length > 0) {
-					expandEmptySpace();
-				}
-			}
-
-			//Check if number
-			if (board[clickedRow][clickedCol].value > 0) {
-				clickedBtn.className += " pressed text" + board[clickedRow][clickedCol].value;
-				clickedBtn.innerHTML = board[clickedRow][clickedCol].value;
-				board[clickedRow][clickedCol].checked = true;
-			}
-		}
+		leftClick(clickedRow, clickedCol, clickedCell);
 	}
 	if (event.type == 'contextmenu') {	//Right click
 		// console.log('Right click at '+clickedRow+", "+clickedCol);
-
-		//Switch through empty, F, and ?
-		if (!clickedBtn.classList.contains('pressed')) {
-			if (clickedBtn.innerHTML == "") {
-				clickedBtn.innerHTML = flagChar;
-				clickedBtn.className = "gameBoardBtn textF"
-				setBtn('\u{1f6a9}');	//Triangular Flag
-			}
-			else if (clickedBtn.innerHTML == flagChar) {
-				clickedBtn.innerHTML = quesChar;
-				clickedBtn.className = "gameBoardBtn textQ"
-				setBtn('\u{1f914}');	//Thinking Face
-			}
-			else if (clickedBtn.innerHTML == quesChar) {
-				clickedBtn.innerHTML = "";
-				clickedBtn.className = "gameBoardBtn"
-				setBtn('\u{1f610}');	//Neutral Face
-			}
-		}
+		rightClick(clickedCell);
 	}
 	updateFlagCount();
 	checkWin();	//Check for win
 }
+function leftClick(clickedRow, clickedCol, clickedCell) {
+	setBtn('\u{1f610}');	//Neutral Face
 
+	//Check for a value already being here
+	if (clickedCell.innerHTML == "") {	//If there is not anything already there, we can take action
+		if (board[clickedRow][clickedCol].mine) {	//Check for Lose
+			board[clickedRow][clickedCol].value = explChar;	//set value of clicked cell to the explChar
+			clickedCell.classList.add('textM');	//add the appropriate class
+			loseEndGame();
+			return;
+		}
+		if (board[clickedRow][clickedCol].value == 0) {	//Check if blank
+			toCheck.push({ row: clickedRow, col: clickedCol });
+			//We want to set this button to pressed, and expand until we hit the edge or numbers
+			while (toCheck.length > 0) {
+				expandEmptySpace();
+			}
+		}
+		if (board[clickedRow][clickedCol].value > 0) {	//Check if number
+			clickedCell.classList.add('pressed');
+			clickedCell.classList.add('text'+board[clickedRow][clickedCol].value);
+			clickedCell.innerHTML = board[clickedRow][clickedCol].value;
+			board[clickedRow][clickedCol].checked = true;
+		}
+	}
+}
+function rightClick(clickedCell) {
+	//Switch through empty, F, and ?
+	if (!clickedCell.classList.contains('pressed')) {
+		if (clickedCell.innerHTML == "") {
+			clickedCell.innerHTML = flagChar;	//set cell to display the flag character
+			clickedCell.classList.add('textF');	//add the appropriate class
+			clickedCell.classList.remove('textQ');	//remove irrelevant classes
+			setBtn('\u{1f6a9}');	//display the Triangular Flag emoji on the reset button
+		}
+		else if (clickedCell.innerHTML == flagChar) {
+			clickedCell.innerHTML = quesChar;	//set cell to display the question character
+			clickedCell.classList.add('textQ');	//add the appropriate class
+			clickedCell.classList.remove('textF');	//remove irrelevant classes
+			setBtn('\u{1f914}');	//display the Thinking Face emoji on the reset button
+		}
+		else if (clickedCell.innerHTML == quesChar) {
+			clickedCell.innerHTML = "";	//set cell back to empty
+			clickedCell.classList.add();	//add the appropriate class
+			clickedCell.classList.remove('textF', 'textQ');	//remove irrelevant classes
+			setBtn('\u{1f610}');	//display the Neutral Face emoji on the reset button
+		}
+	}
+}
 function expandEmptySpace() {
 	r = parseInt(toCheck[0].row, 10);
 	c = parseInt(toCheck[0].col, 10);
@@ -257,17 +257,17 @@ function expandEmptySpace() {
 
 
 	//Add the class
-	document.getElementById('btn_' + r + '_' + c).className += " pressed";
+	document.getElementById('cell_' + r + '_' + c).classList.add('pressed');
 
 	//Display the value
 	if (parseInt(board[r][c].value) > 0) {
-		document.getElementById('btn_' + r + '_' + c).innerHTML = board[r][c].value;
-		document.getElementById('btn_' + r + '_' + c).className += " text" + board[r][c].value;
+		document.getElementById('cell_' + r + '_' + c).innerHTML = board[r][c].value;
+		document.getElementById('cell_' + r + '_' + c).classList.add('text'+board[r][c].value);
 	}
 
 	if (board[r][c].value == 0) {
 		//Reset the value, just in case a flag exists
-		document.getElementById('btn_' + r + '_' + c).innerHTML = "";
+		document.getElementById('cell_' + r + '_' + c).innerHTML = "";
 
 		//We want to check all of the neighbors as well
 		if (!isUndefined(board, r + 1, c) && !board[r + 1][c].checked) { toCheck.push({ row: r + 1, col: c }); board[r + 1][c].checked = true; }
@@ -282,19 +282,18 @@ function expandEmptySpace() {
 	// console.log('Elements left to check: ' +toCheck.length);
 	// console.log(toCheck[0].row + ' ' + toCheck[0].col);
 }
-
 function updateFlagCount() {
 	var foundFlags = 0;
 
 	for (var i = 0; i < totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
-			var c = document.getElementById('btn_' + i + '_' + j);
+			var c = document.getElementById('cell_' + i + '_' + j);
 			if (c.innerHTML == flagChar || (c.innerHTML == mineChar && !c.classList.contains('exploded')))
 				foundFlags++;
 		}
 	}
 
-	var flagsLeft = totalMines - foundFlags;
+	var flagsLeft = totalMins - foundFlags;
 
 	document.getElementById('flagsDiv').innerHTML = flagsLeft;
 }
@@ -306,7 +305,7 @@ function checkWin() {
 
 	for (var i = 0; i < totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
-			var cur = document.getElementById('btn_' + i + '_' + j);
+			var cur = document.getElementById('cell_' + i + '_' + j);
 			if (!cur.classList.contains('pressed') && !cur.classList.contains('exploded')) {
 				//We dont want to count pressed or exploded cells
 				unpressedCells++;
@@ -319,7 +318,7 @@ function checkWin() {
 	}
 	// console.log(unpressedCells+ ' unpressed cells remaining');
 
-	if (unpressedCells == totalMines && document.querySelector('.exploded') == null) {
+	if (unpressedCells == totalMins && document.querySelector('.exploded') == null) {
 		pauseTimer();
 
 		displayMines();
@@ -330,26 +329,25 @@ function checkWin() {
 		setBtn(boardMap.get(boardSize.toString()).winFace);	//Set btn to appropriate face
 	}
 }
-
 function loseEndGame() {
 	var alertPanel = document.getElementById("alertPanel");
 
 	pauseTimer();
 	for (var i = 0; i < totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
-			var curBtn = document.getElementById('btn_' + i + '_' + j);
+			var curCell = document.getElementById('cell_' + i + '_' + j);
 
 			//Explode the unmarked mines
-			if (board[i][j].mine && curBtn.innerHTML != flagChar) {
-				// console.log("Setting btn_"+i+"_"+j+" to "+board[i][j].value);
-				curBtn.innerHTML = board[i][j].value;
-				curBtn.className += " exploded";
+			if (board[i][j].mine && curCell.innerHTML != flagChar) {
+				// console.log("Setting cell_"+i+"_"+j+" to "+board[i][j].value);
+				curCell.innerHTML = board[i][j].value;
+				curCell.classList.add('exploded');
 			}
 
 			//X out the incorrect flags
-			else if (!board[i][j].mine && curBtn.innerHTML == flagChar) {
-				// console.log("Setting btn_"+i+"_"+j+" to x");
-				curBtn.innerHTML = "x";
+			else if (!board[i][j].mine && curCell.innerHTML == flagChar) {
+				// console.log("Setting cell_"+i+"_"+j+" to x");
+				curCell.innerHTML = wronChar;
 			}
 		}
 	}
@@ -361,36 +359,46 @@ function loseEndGame() {
 
 
 /* Utility functions */
+function rstBtn(ele, event) {
+	//Handle events on the reset button
+	type = event.type;	//the type of event it was
+
+	if (type == "click") {
+		btnValue = '\u{1f610}';	//reset back to neutral face
+		start();	//proceed to start function
+	}
+	else if (type == "mousedown") {
+		btnValue = ele.getAttribute('value');	//save the current value of the reset button
+		ele.value='\u{1f92a}';	//GRINNING FACE WITH ONE LARGE AND ONE SMALL EYE
+	}
+	else if (type == "mouseleave") {
+		ele.value = btnValue;	//reset btn value to what was previously saved
+	}
+}
 function clearAlerts() {
 	document.getElementById("alertPanel").innerHTML = "";
 }
-
 function disableBoard() {
 	for (var i = 0; i < totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
-			var curBtn = document.getElementById('btn_' + i + '_' + j);
-
-			//Disable the button by adding the disabled class
-			curBtn.className += " disabled";
+			var curCell = document.getElementById('cell_' + i + '_' + j);
+			
+			curCell.classList.add('disabled');	//Disable the cell by adding the disabled class
 		}
 	}
-
-	//clear the board variable
-	board = new Array();
+	board = new Array();	//clear the board variable
 }
-
 function displayMines() {
 	for (var i = 0; i < totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
-			var cur = document.getElementById('btn_' + i + '_' + j);
+			var cur = document.getElementById('cell_' + i + '_' + j);
 			if (!cur.classList.contains('pressed') && cur.innerHTML == "" && board[i][j].mine) {
-				cur.innerHTML = mineChar;
-				cur.classList.add('textB');
+				cur.innerHTML = board[i][j].value;	//display the value of the board at the current location
+				cur.classList.add('textF');
 			}
 		}
 	}
 }
-
 function isUndefined(_arr, _index1, _index2) {
 	//This function identifies whether the passed cell is valid
 	try {
@@ -399,7 +407,7 @@ function isUndefined(_arr, _index1, _index2) {
 		return true;
 	}
 }
-
 function setBtn(emojiCode) {
 	document.getElementById("resetBtn").value = emojiCode;
+	btnValue = emojiCode;
 }

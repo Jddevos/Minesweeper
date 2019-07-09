@@ -113,15 +113,15 @@ input[type=number]::-webkit-outer-spin-button {
 
 /* TEXT COLOR */
 .textQ {
+	/* question */
 	color: orange;
 }
 .textF {
-	color: darkred;
-}
-.textB {
+	/* flag */
 	color: darkred;
 }
 .textM {
+	/* mine */
 	color: black;
 }
 .text1 {

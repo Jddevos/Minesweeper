@@ -16,9 +16,6 @@ An HTML/JS game of minesweeper
 #### Bug Fixes
 - Code comments
 - Code standardization
-- Things are wonky when flagChar is set to an emoji (&#128681)
-    - flagsDiv value not being properly set
-    - Character disappears when game is lost
 
 
 
@@ -29,3 +26,4 @@ An HTML/JS game of minesweeper
 - Preset board size options
 - Reset button dynamically changes
 - Custom size options
+- Things are wonky when flagChar is set to an emoji (&#128681)
