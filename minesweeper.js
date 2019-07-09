@@ -6,16 +6,16 @@ var totalCols = 0;	//Total number of columns
 var totalMines = 0;	//Total number of mines
 var generatedBoard = false;	//Has the board been generated yet?
 var mineChar = "O";	//Character to display to indicate a mine
-var flagChar = "F";	//Character to display to indicate a flag
+var flagChar = "\u{1f6a9}";	//Character to display to indicate a flag
 var quesChar = "?";	//Character to display to indicate a question
 var boardSize = "sm";	//The size of the board
 
 /* Board sizes */
-var sm = {rows: 8, cols: 8, mines: 10, winFace: 128578};	//8x8_10, Slightly Smiling Face
-var md = {rows: 16, cols: 16, mines: 40, winFace: 128522};	//16x16_40, Smiling Face With Smiling Eyes
-var lg = {rows: 16, cols: 30, mines: 99, winFace: 129321};	//16x30_99, Star-Struck
-var xl = {rows: 24, cols: 30, mines: 225, winFace: 129299};	//24x30_225, Nerd Face
-var cu = {rows: 8, cols: 8, mines: 10, winFace: 128566};	//Face Without Mouth
+var sm = {rows: 8, cols: 8, mines: 10, winFace: '\u{1f642}'};	//8x8_10, Slightly Smiling Face
+var md = {rows: 16, cols: 16, mines: 40, winFace: '\u{1f60a}'};	//16x16_40, Smiling Face With Smiling Eyes
+var lg = {rows: 16, cols: 30, mines: 99, winFace: '\u{1f929}'};	//16x30_99, Star-Struck
+var xl = {rows: 24, cols: 30, mines: 225, winFace: '\u{1f913}'};	//24x30_225, Nerd Face
+var cu = {rows: 8, cols: 8, mines: 10, winFace: '\u{1f636}'};	//Face Without Mouth
 
 /* Map of board sizes */
 var boardMap = new Map();
@@ -49,7 +49,7 @@ function generateDisplay() {
 	resetDiv = document.createElement('div');
 	resetDiv.id = "resetDiv"
 	resetDiv.className = "resetDiv";
-	//Initial innerHTML contents are set below, in the call to setBtn
+	resetDiv.innerHTML = "<input type='Button' id='resetBtn' value='\u{1f610}' onclick='start()'></input>";	//Neutral Face
 	infoDiv.appendChild(resetDiv);
 
 	flagsDiv = document.createElement('div');
@@ -59,8 +59,6 @@ function generateDisplay() {
 	infoDiv.appendChild(flagsDiv);
 
 	boardDiv.appendChild(infoDiv);	//Append to boardDiv
-	
-	setBtn(128528);	//Neutral Face
 
 	//Generate cells
 	for (var i = 0; i < totalRows; i++) {
@@ -188,7 +186,7 @@ function play(ele, event) {
 	if (event.type == 'click') {	//Left click
 		// console.log('Left click at '+clickedRow+", "+clickedCol);
 
-		setBtn(128528);	//Neutral Face
+		setBtn('\u{1f610}');	//Neutral Face
 
 		//Check for a value already being here
 		if (clickedBtn.innerHTML == "") {
@@ -226,17 +224,17 @@ function play(ele, event) {
 			if (clickedBtn.innerHTML == "") {
 				clickedBtn.innerHTML = flagChar;
 				clickedBtn.className = "gameBoardBtn textF"
-				setBtn(128681);	//Triangular Flag
+				setBtn('\u{1f6a9}');	//Triangular Flag
 			}
 			else if (clickedBtn.innerHTML == flagChar) {
 				clickedBtn.innerHTML = quesChar;
 				clickedBtn.className = "gameBoardBtn textQ"
-				setBtn(129300);	//Thinking Face
+				setBtn('\u{1f914}');	//Thinking Face
 			}
 			else if (clickedBtn.innerHTML == quesChar) {
 				clickedBtn.innerHTML = "";
 				clickedBtn.className = "gameBoardBtn"
-				setBtn(128528);	//Neutral Face
+				setBtn('\u{1f610}');	//Neutral Face
 			}
 		}
 	}
@@ -357,7 +355,7 @@ function loseEndGame() {
 	}
 	disableBoard();
 
-	setBtn(129327);	//Exploding Head
+	setBtn('\u{1f92f}');	//Exploding Head
 	alertPanel.innerHTML = 'You lost.';
 }
 
@@ -403,5 +401,5 @@ function isUndefined(_arr, _index1, _index2) {
 }
 
 function setBtn(emojiCode) {
-	document.getElementById("resetDiv").innerHTML = "<input type='Button' id='resetBtn' value='&#"+emojiCode+"' onclick='start()'>";
+	document.getElementById("resetBtn").value = emojiCode;
 }
