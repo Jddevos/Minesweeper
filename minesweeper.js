@@ -1,28 +1,27 @@
 /* Global variables */
 var board = new Array();	//This will hold the game board in its entirety
 var toCheck = new Array();	//Will hold the list of cells to check when expanding empty space
-var totalRows = 0;	//Total number of rows
-var totalCols = 0;	//Total number of columns
-var totalMins = 0;	//Total number of mines
-var boardSize = "sm";	//The size of the board
+var totalRows = 0;			//Total number of rows
+var totalCols = 0;			//Total number of columns
+var totalMins = 0;			//Total number of mines
+var boardSize = "sm";		//The size of the board
 var generatedBoard = false;	//Has the board been generated yet?
 var btnValue = '\u{1f610}';	//Will hold the value of the reset button
 
 /* Display Characters */
-//Full list of emojis can be founs at https://unicode.org/emoji/charts-12.0/full-emoji-list.html
+//https://unicode.org/emoji/charts-12.0/full-emoji-list.html
 var mineChar = "\u{1f4a3}";	//Character to display to indicate a mine
 var flagChar = "\u{1f6a9}";	//Character to display to indicate a flag
-var quesChar = "\u{2753}";	//Character to display to indicate a question
+var quesChar = "\u{02753}";	//Character to display to indicate a question
 var wronChar = "\u{1f4a2}";	//Character to display when a flag is incorrect after losing
 var explChar = "\u{1f4a5}";	//Character to display when a mine is clicked
 
-
 /* Board sizes */
-var sm = {rows: 8, cols: 8, mines: 10, winFace: '\u{1f642}'};	//8x8_10, Slightly Smiling Face
-var md = {rows: 16, cols: 16, mines: 40, winFace: '\u{1f60a}'};	//16x16_40, Smiling Face With Smiling Eyes
-var lg = {rows: 16, cols: 30, mines: 99, winFace: '\u{1f929}'};	//16x30_99, Star-Struck
+var sm = {rows:  8, cols:  8, mines:  10, winFace: '\u{1f642}'};	//8x8_10, Slightly Smiling Face
+var md = {rows: 16, cols: 16, mines:  40, winFace: '\u{1f60a}'};	//16x16_40, Smiling Face With Smiling Eyes
+var lg = {rows: 16, cols: 30, mines:  99, winFace: '\u{1f929}'};	//16x30_99, Star-Struck
 var xl = {rows: 24, cols: 30, mines: 225, winFace: '\u{1f913}'};	//24x30_225, Nerd Face
-var cu = {rows: 8, cols: 8, mines: 10, winFace: '\u{1f636}'};	//Face Without Mouth
+var cu = {rows:  8, cols:  8, mines:  10, winFace: '\u{1f636}'};	//Face Without Mouth
 
 /* Map of board sizes */
 var boardMap = new Map();
@@ -32,13 +31,18 @@ boardMap.set("lg", lg);
 boardMap.set("xl", xl);
 boardMap.set("cu", cu);
 
+/* Leaderboard */
+let leaderboards = new Array();	//Local array of the leaderboards
+localStorage.setItem('boards', JSON.stringify(leaderboards));
+// const data = JSON.parse(localStorage.getItem('boards'));
+
 document.oncontextmenu = function () {
 	return false;	//This disables the right click context menu
 }
 
 /* Before the game starts */
 function generateDisplay() {
-	boardDiv = document.getElementById("board");
+	boardDiv = document.getElementById('board');
 	boardDiv.innerHTML = "";
 
 	//Generate info panel
@@ -54,7 +58,7 @@ function generateDisplay() {
 	resetDiv = document.createElement('div');
 	resetDiv.id = "resetDiv"
 	resetDiv.className = "resetDiv";
-	resetDiv.innerHTML = "<input type='Button' id='resetBtn' value='\u{1f610}' onclick='rstBtn(this, event)' onmousedown='rstBtn(this, event)' onmouseleave='rstBtn(this, event)'/>";
+	resetDiv.innerHTML = "<input type='Button' id='resetBtn' value='\u{1f610}' onclick='rstBtn(this, event)' onmousedown='rstBtn(this, event)' onmouseleave='rstBtn(this, event)' onmouseover='rstBtn(this, event)'/>";
 	infoDiv.appendChild(resetDiv);
 
 	flagsDiv = document.createElement('div');
@@ -120,6 +124,25 @@ function generateBoard(initClick) {
 	generatedBoard = true;	//Mark the board as generated
 	// console.log(board);
 }
+function pageLoad() {
+	leaderDiv = document.getElementById('leaders');	//Grab the div
+
+	if (localStorage.getItem('boards')) {	//check if the boards local storage already exists
+		leaderboards = JSON.parse(localStorage.getItem('boards'));	//if it does, load it into the leaderboards var
+	}
+	else {	//if it does not already exist, we need to create it for the first time
+		for (var i=0; i<boardMap.length(); i++) {
+			//Create default array here
+			
+		}
+	}
+
+
+
+
+
+	start();	//Load up the game	
+}
 function start() {
 	clearAlerts();	//Clear any alerts
 
@@ -165,7 +188,6 @@ function start() {
 		setBtn(128565);	//Dizzy Face
 	}
 }
-
 
 /* Game play */
 function play(ele, event) {
@@ -299,7 +321,6 @@ function updateFlagCount() {
 	document.getElementById('flagsDiv').innerHTML = flagsLeft;
 }
 
-
 /* End conditions */
 function checkWin() {
 	var unpressedCells = 0;
@@ -357,7 +378,6 @@ function loseEndGame() {
 	setBtn('\u{1f92f}');	//Exploding Head
 	alertPanel.innerHTML = 'You lost.';
 }
-
 
 /* Utility functions */
 function rstBtn(ele, event) {

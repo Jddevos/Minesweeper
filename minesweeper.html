@@ -7,7 +7,7 @@
 		<script src="minesweeper.js"></script>
 		<script src="storage.js"></script>
 	</head>
-	<body onload="start()">
+	<body onload="pageLoad()">
 		<form autocomplete="off" id="settings">
 			S:<input type="radio" name="size" value="sm" onchange="start()" checked="checked">
 			M:<input type="radio" name="size" value="md" onchange="start()">
@@ -19,10 +19,11 @@
 			C:<input type="number" name="cols" id="cols" min="8" max="30" value="9" class="input number">
 			M:<input type="number" name="mines" id="mines" min="8" max="225" value="10" class="input number">
 			<span>&#124;&#124;</span>
-			N:<input type="text" name="name" id="name" placeholder="name" defaultValue="AAA">
+			N:<input type="text" name="name" id="name" class="input" placeholder="name" defaultValue="AAA">
 		</form>
 		<div id="board"></div>
 		<div id="alertPanel"></div>
+		<div id="leaders"></div>
 		<script src="timer.js"></script>
 	</body>
 </html>

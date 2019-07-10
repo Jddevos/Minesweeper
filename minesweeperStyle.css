@@ -1,4 +1,8 @@
 /* ELEMENTS */
+body {
+	align-content: center;
+	text-align: center;
+}	
 button {
     margin: -1px;
 	padding: -1px;
@@ -8,7 +12,7 @@ html {
 }
 input[type=number] {
 	/* Hide input spinners in Firefox */
-    -moz-appearance:textfield;
+	-moz-appearance: textfield;
 }
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button {
@@ -26,6 +30,13 @@ input[type=number]::-webkit-outer-spin-button {
 #board {
 	display: inline-block;
 	border: 2px solid black;
+	margin-top: 1rem;
+
+	/* disable highlighting of the board */
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 
@@ -67,7 +78,7 @@ input[type=number]::-webkit-outer-spin-button {
 	display: inline-block;
 }
 .input {
-	height: 0.65rem;
+	/* height: 0.65rem; */
 	display: inline-block;
 	overflow: hidden;
 }
