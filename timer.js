@@ -26,7 +26,7 @@ function pauseTimer() {
 }
 
 function resetTimer() {
-	timerDisplay = document.getElementById('timer');
+	timerDisplay = document.getElementById('timerDiv');
 	clearInterval(tInterval);
 	savedTime = 0;
 	difference = 0;
@@ -36,7 +36,7 @@ function resetTimer() {
 }
 
 function getShowTime() {
-	timerDisplay = document.getElementById('timer');
+	timerDisplay = document.getElementById('timerDiv');
 
 	updatedTime = new Date().getTime();
 	if (savedTime) {

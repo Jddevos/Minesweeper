@@ -10,11 +10,11 @@ var btnValue = '\u{1f610}';	//Will hold the value of the reset button
 
 /* Display Characters */
 //https://unicode.org/emoji/charts-12.0/full-emoji-list.html
-var mineChar = "\u{1f4a3}";	//Character to display to indicate a mine
-var flagChar = "\u{1f6a9}";	//Character to display to indicate a flag
-var quesChar = "\u{02753}";	//Character to display to indicate a question
-var wronChar = "\u{1f4a2}";	//Character to display when a flag is incorrect after losing
-var explChar = "\u{1f4a5}";	//Character to display when a mine is clicked
+const mineChar = "\u{1f4a3}";	//Character to display to indicate a mine
+const flagChar = "\u{1f6a9}";	//Character to display to indicate a flag
+const quesChar = "\u{02753}";	//Character to display to indicate a question
+const wronChar = "\u{1f4a2}";	//Character to display when a flag is incorrect after losing
+const explChar = "\u{1f4a5}";	//Character to display when a mine is clicked
 
 /* Board sizes */
 var sm = {rows:  8, cols:  8, mines:  10, winFace: '\u{1f642}'};	//8x8_10, Slightly Smiling Face
@@ -23,7 +23,6 @@ var lg = {rows: 16, cols: 30, mines:  99, winFace: '\u{1f929}'};	//16x30_99, Sta
 var xl = {rows: 24, cols: 30, mines: 225, winFace: '\u{1f913}'};	//24x30_225, Nerd Face
 var cu = {rows:  8, cols:  8, mines:  10, winFace: '\u{1f636}'};	//Face Without Mouth
 
-/* Map of board sizes */
 var boardMap = new Map();
 boardMap.set("sm", sm);
 boardMap.set("md", md);
@@ -31,37 +30,120 @@ boardMap.set("lg", lg);
 boardMap.set("xl", xl);
 boardMap.set("cu", cu);
 
-/* Leaderboard */
-let leaderboards = new Array();	//Local array of the leaderboards
-localStorage.setItem('boards', JSON.stringify(leaderboards));
-// const data = JSON.parse(localStorage.getItem('boards'));
+/* Storage */
+var smBoard = new Array();		//small leaderboard
+var mdBoard = new Array();		//medium leaderboard
+var lgBoard = new Array();		//large leaderboard
+var xlBoard = new Array();		//extra large leaderboard
+
+const leaderboardEntries = 5;		//How many high scores to keep on each leaderboard
+var leaderboards = new Array();
+leaderboards.push({sm: smBoard});
+leaderboards.push({md: mdBoard});
+leaderboards.push({lg: lgBoard});
+leaderboards.push({xl: xlBoard});
+
 
 document.oncontextmenu = function () {
 	return false;	//This disables the right click context menu
 }
-
+/*=============================================================================================================*/
 /* Before the game starts */
+function pageLoad() {
+	start();	//Load up the game
+
+	var userName;	//declare userName
+	var nameField = document.getElementById('userName');	//Grab the div
+	if (!localStorage.getItem('userName')) {	//if the userName doesn't already exist
+		userName = prompt("Leaderboard Name", "AAA");	//prompt for the name to use on the leaderboards
+		localStorage.setItem('userName', userName);
+	}
+	nameField.value = localStorage.getItem('userName');	//put the username into the name field
+
+
+	//leaderboards
+	var leaderDiv = document.getElementById('leaders');	//Grab the div
+
+	if (localStorage.getItem('boards')) {	//check if the boards local storage already exists
+		leaderboards = JSON.parse(localStorage.getItem('boards'));	//if it does, load it into the leaderboards var
+	}
+	else {	//if it does not already exist, we need to create it for the first time
+		leaderboards.forEach(generateLbData);	//call function to pre-populate leaderboard data
+		localStorage.setItem('boards', JSON.stringify(leaderboards));
+	}
+
+
+
+
+
+		
+}
+function start() {
+	clearAlerts();	//Clear any alerts
+
+	boardSize = document.querySelector('input[name="size"]:checked').value;	//pull the value out of the selected radio button
+
+	if (boardSize.toString() == 'cu') {	//custom size board
+		//We need to make the input areas editable
+		document.getElementById("rows").readOnly = false;
+		document.getElementById("cols").readOnly = false;
+		document.getElementById("mines").readOnly = false;
+
+		//Set the totalRows, totalCols, and totalMins variables
+		totalRows = parseInt(document.getElementById("rows").value, 10);
+		totalCols = parseInt(document.getElementById("cols").value, 10);
+		totalMins = parseInt(document.getElementById("mines").value, 10);
+	}
+	else {	//standard size board
+		//We need to make the input areas readOnly
+		document.getElementById("rows").readOnly = true;
+		document.getElementById("cols").readOnly = true;
+		document.getElementById("mines").readOnly = true;
+
+		//Set the totalRows, totalCols, and totalMins variables
+		totalRows = boardMap.get(boardSize.toString()).rows;
+		totalCols = boardMap.get(boardSize.toString()).cols;
+		totalMins = boardMap.get(boardSize.toString()).mines;
+
+		//Set the input boxes so that they match whatever the current selection is
+		document.getElementById("rows").value = totalRows;
+		document.getElementById("cols").value = totalCols;
+		document.getElementById("mines").value = totalMins;
+	}
+	
+	generatedBoard = false;	//Set this to false so that the board will be regenerated
+
+	if (document.getElementById("settings").checkValidity()) {	//If everything is valid, proceed
+		flagsLeft = totalMins;	//set the number of flags left
+		generateDisplay();	//redraw the board
+		resetTimer();	//reset timer to 0
+	}
+	else {	//If things are not valid, display an error
+		document.getElementById("alertPanel").innerHTML = "The supplied parameters were not valid.";
+		setBtn(128565);	//Dizzy Face
+	}
+}
 function generateDisplay() {
-	boardDiv = document.getElementById('board');
+	var boardDiv = document.getElementById('board');
 	boardDiv.innerHTML = "";
 
 	//Generate info panel
-	infoDiv = document.createElement('div');
+	var infoDiv = document.createElement('div');
 	infoDiv.id = "infoContainer";
 	
-	timerDiv = document.createElement('div');
-	timerDiv.id = "timer";
-	timerDiv.className = "timer";
+	var timerDiv = document.createElement('div');
+	timerDiv.id = "timerDiv";
+	timerDiv.className = "timerDiv";
 	timerDiv.innerHTML = "00:00:00";
 	infoDiv.appendChild(timerDiv);
 
-	resetDiv = document.createElement('div');
+	var resetDiv = document.createElement('div');
 	resetDiv.id = "resetDiv"
 	resetDiv.className = "resetDiv";
 	resetDiv.innerHTML = "<input type='Button' id='resetBtn' value='\u{1f610}' onclick='rstBtn(this, event)' onmousedown='rstBtn(this, event)' onmouseleave='rstBtn(this, event)' onmouseover='rstBtn(this, event)'/>";
 	infoDiv.appendChild(resetDiv);
 
-	flagsDiv = document.createElement('div');
+	var flagsDiv = document.createElement('div');
 	flagsDiv.id = "flagsDiv";
 	flagsDiv.className = "flagsDiv";
 	flagsDiv.innerHTML = totalMins;
@@ -124,71 +206,14 @@ function generateBoard(initClick) {
 	generatedBoard = true;	//Mark the board as generated
 	// console.log(board);
 }
-function pageLoad() {
-	leaderDiv = document.getElementById('leaders');	//Grab the div
-
-	if (localStorage.getItem('boards')) {	//check if the boards local storage already exists
-		leaderboards = JSON.parse(localStorage.getItem('boards'));	//if it does, load it into the leaderboards var
+function generateLbData(element, index, array) {
+	let curBoard = new Array();
+	for (var i=0; i<leaderboardEntries; i++) {	//generate leaderboardEntries number of entries
+		curBoard.push({slot: i+1, name: 'AAA', time: '99:99:99'});	//Create an entry with a slot, name, and time
 	}
-	else {	//if it does not already exist, we need to create it for the first time
-		for (var i=0; i<boardMap.length(); i++) {
-			//Create default array here
-			
-		}
-	}
-
-
-
-
-
-	start();	//Load up the game	
+	array[index] = curBoard;	//add the list into the leaderboard list
 }
-function start() {
-	clearAlerts();	//Clear any alerts
-
-	boardSize = document.querySelector('input[name="size"]:checked').value;	//pull the value out of the selected radio button
-
-	if (boardSize.toString() == 'cu') {	//custom size board
-		//We need to make the input areas editable
-		document.getElementById("rows").readOnly = false;
-		document.getElementById("cols").readOnly = false;
-		document.getElementById("mines").readOnly = false;
-
-		//Set the totalRows, totalCols, and totalMins variables
-		totalRows = parseInt(document.getElementById("rows").value, 10);
-		totalCols = parseInt(document.getElementById("cols").value, 10);
-		totalMins = parseInt(document.getElementById("mines").value, 10);
-	}
-	else {	//standard size board
-		//We need to make the input areas readOnly
-		document.getElementById("rows").readOnly = true;
-		document.getElementById("cols").readOnly = true;
-		document.getElementById("mines").readOnly = true;
-
-		//Set the totalRows, totalCols, and totalMins variables
-		totalRows = boardMap.get(boardSize.toString()).rows;
-		totalCols = boardMap.get(boardSize.toString()).cols;
-		totalMins = boardMap.get(boardSize.toString()).mines;
-
-		//Set the input boxes so that they match whatever the current selection is
-		document.getElementById("rows").value = totalRows;
-		document.getElementById("cols").value = totalCols;
-		document.getElementById("mines").value = totalMins;
-	}
-	
-	generatedBoard = false;	//Set this to false so that the board will be regenerated
-
-	if (document.getElementById("settings").checkValidity()) {	//If everything is valid, proceed
-		flagsLeft = totalMins;	//set the number of flags left
-		generateDisplay();	//redraw the board
-		resetTimer();	//reset timer to 0
-	}
-	else {	//If things are not valid, display an error
-		document.getElementById("alertPanel").innerHTML = "The supplied parameters were not valid.";
-		setBtn(128565);	//Dizzy Face
-	}
-}
-
+/*=============================================================================================================*/
 /* Game play */
 function play(ele, event) {
 	var clickedRow = Math.round(ele.getAttribute('row'));
@@ -320,7 +345,7 @@ function updateFlagCount() {
 
 	document.getElementById('flagsDiv').innerHTML = flagsLeft;
 }
-
+/*=============================================================================================================*/
 /* End conditions */
 function checkWin() {
 	var unpressedCells = 0;
@@ -378,7 +403,7 @@ function loseEndGame() {
 	setBtn('\u{1f92f}');	//Exploding Head
 	alertPanel.innerHTML = 'You lost.';
 }
-
+/*=============================================================================================================*/
 /* Utility functions */
 function rstBtn(ele, event) {
 	//Handle events on the reset button
