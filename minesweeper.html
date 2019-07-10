@@ -8,20 +8,21 @@
 		<script src="storage.js"></script>
 	</head>
 	<body onload="pageLoad()">
+		<form autocomplete="off" id="settings">
+			S:<input type="radio" name="size" value="sm" onchange="start()" checked="checked">
+			M:<input type="radio" name="size" value="md" onchange="start()">
+			L:<input type="radio" name="size" value="lg" onchange="start()">
+			X:<input type="radio" name="size" value="xl" onchange="start()">
+			C:<input type="radio" name="size" value="cu" onchange="start()">
+			<span>&#124;&#124;</span>
+			<!-- 35x75_2600 max size -->
+			R:<input type="number" name="rows" id="rows" min="8" max="999" value="9" class="input number">
+			C:<input type="number" name="cols" id="cols" min="8" max="999" value="9" class="input number">
+			M:<input type="number" name="mines" id="mines" min="8" max="9999" value="10" class="input number">
+			<span>&#124;&#124;</span>
+			N:<input type="text" name="userName" id="userName" class="input" placeholder="AAA" defaultValue="AAA">
+		</form>
 		<div class="parent">
-			<form autocomplete="off" id="settings">
-				S:<input type="radio" name="size" value="sm" onchange="start()" checked="checked">
-				M:<input type="radio" name="size" value="md" onchange="start()">
-				L:<input type="radio" name="size" value="lg" onchange="start()">
-				X:<input type="radio" name="size" value="xl" onchange="start()">
-				C:<input type="radio" name="size" value="cu" onchange="start()">
-				<span>&#124;&#124;</span>
-				R:<input type="number" name="rows" id="rows" min="8" max="35" value="9" class="input number">
-				C:<input type="number" name="cols" id="cols" min="8" max="75" value="9" class="input number">
-				M:<input type="number" name="mines" id="mines" min="8" max="2600" value="10" class="input number">
-				<span>&#124;&#124;</span>
-				N:<input type="text" name="userName" id="userName" class="input" placeholder="AAA" defaultValue="AAA">
-			</form>
 			<div id="board" class="child"></div>
 			<div id="leaders" class="child"></div>
 		</div>

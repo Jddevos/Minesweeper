@@ -1,5 +1,5 @@
 /* Global variables */
-var board = new Array();	//This will hold the game board in its entirety
+var board   = new Array();	//This will hold the game board in its entirety
 var toCheck = new Array();	//Will hold the list of cells to check when expanding empty space
 var totalRows = 0;			//Total number of rows
 var totalCols = 0;			//Total number of columns
@@ -17,11 +17,11 @@ const wronChar = "\u{1f4a2}";	//Character to display when a flag is incorrect af
 const explChar = "\u{1f4a5}";	//Character to display when a mine is clicked
 
 /* Board sizes */
-var sm = {rows:  8, cols:  8, mines:  10, winFace: '\u{1f642}'};	//8x8_10, Slightly Smiling Face
-var md = {rows: 16, cols: 16, mines:  40, winFace: '\u{1f60a}'};	//16x16_40, Smiling Face With Smiling Eyes
-var lg = {rows: 16, cols: 30, mines:  99, winFace: '\u{1f929}'};	//16x30_99, Star-Struck
-var xl = {rows: 24, cols: 30, mines: 225, winFace: '\u{1f913}'};	//24x30_225, Nerd Face
-var cu = {rows:  8, cols:  8, mines:  10, winFace: '\u{1f636}'};	//Face Without Mouth
+var sm = {rows:  8, cols:  8, mines:  10, lb:  0, winFace: '\u{1f642}'};	//8x8_10, Slightly Smiling Face
+var md = {rows: 16, cols: 16, mines:  40, lb:  1, winFace: '\u{1f60a}'};	//16x16_40, Smiling Face With Smiling Eyes
+var lg = {rows: 16, cols: 30, mines:  99, lb:  2, winFace: '\u{1f929}'};	//16x30_99, Star-Struck
+var xl = {rows: 24, cols: 30, mines: 225, lb:  3, winFace: '\u{1f913}'};	//24x30_225, Nerd Face
+var cu = {rows:  8, cols:  8, mines:  10, lb: -1, winFace: '\u{1f636}'};	//Face Without Mouth
 
 var boardMap = new Map();
 boardMap.set("sm", sm);
@@ -31,18 +31,14 @@ boardMap.set("xl", xl);
 boardMap.set("cu", cu);
 
 /* Storage */
-var smBoard = new Array();		//small leaderboard
-var mdBoard = new Array();		//medium leaderboard
-var lgBoard = new Array();		//large leaderboard
-var xlBoard = new Array();		//extra large leaderboard
+var smBoard = [];		//small leaderboard
+var mdBoard = [];		//medium leaderboard
+var lgBoard = [];		//large leaderboard
+var xlBoard = [];		//extra large leaderboard
 
+var leaderboards = [smBoard,mdBoard,lgBoard,xlBoard];
+var curBoard = [];	//The leaderboard for the currently selected size
 const leaderboardEntries = 5;		//How many high scores to keep on each leaderboard
-var leaderboards = new Array();
-leaderboards.push({sm: smBoard});
-leaderboards.push({md: mdBoard});
-leaderboards.push({lg: lgBoard});
-leaderboards.push({xl: xlBoard});
-
 
 document.oncontextmenu = function () {
 	return false;	//This disables the right click context menu
@@ -65,29 +61,25 @@ function pageLoad() {
 	var leaderDiv = document.getElementById('leaders');	//Grab the div
 
 	if (localStorage.getItem('boards')) {	//check if the boards local storage already exists
+		// console.log('Loading leaderboards from localStorage');
 		leaderboards = JSON.parse(localStorage.getItem('boards'));	//if it does, load it into the leaderboards var
 	}
 	else {	//if it does not already exist, we need to create it for the first time
+		// console.log('Creating leaderboards');
 		leaderboards.forEach(generateLbData);	//call function to pre-populate leaderboard data
 		localStorage.setItem('boards', JSON.stringify(leaderboards));
 	}
-
-
-
-
-
-		
+	generateLbDisplay();	//display the leaderboard table
 }
 function start() {
 	clearAlerts();	//Clear any alerts
-
 	boardSize = document.querySelector('input[name="size"]:checked').value;	//pull the value out of the selected radio button
 
-	if (boardSize.toString() == 'cu') {	//custom size board
+	if (boardSize == 'cu') {	//custom size board
 		//We need to make the input areas editable
-		document.getElementById("rows").readOnly = false;
-		document.getElementById("cols").readOnly = false;
-		document.getElementById("mines").readOnly = false;
+		document.getElementById("rows").disabled = false;
+		document.getElementById("cols").disabled = false;
+		document.getElementById("mines").disabled = false;
 
 		//Set the totalRows, totalCols, and totalMins variables
 		totalRows = parseInt(document.getElementById("rows").value, 10);
@@ -96,9 +88,9 @@ function start() {
 	}
 	else {	//standard size board
 		//We need to make the input areas readOnly
-		document.getElementById("rows").readOnly = true;
-		document.getElementById("cols").readOnly = true;
-		document.getElementById("mines").readOnly = true;
+		document.getElementById("rows").disabled = true;
+		document.getElementById("cols").disabled = true;
+		document.getElementById("mines").disabled = true;
 
 		//Set the totalRows, totalCols, and totalMins variables
 		totalRows = boardMap.get(boardSize.toString()).rows;
@@ -116,34 +108,35 @@ function start() {
 	if (document.getElementById("settings").checkValidity()) {	//If everything is valid, proceed
 		flagsLeft = totalMins;	//set the number of flags left
 		generateDisplay();	//redraw the board
+		// generateLbDisplay();	//redraw the leaderboard
 		resetTimer();	//reset timer to 0
 	}
 	else {	//If things are not valid, display an error
 		document.getElementById("alertPanel").innerHTML = "The supplied parameters were not valid.";
-		setBtn(128565);	//Dizzy Face
+		setBtn('\u{1f635}');	//Dizzy Face
 	}
 }
 function generateDisplay() {
-	var boardDiv = document.getElementById('board');
+	let boardDiv = document.getElementById('board');
 	boardDiv.innerHTML = "";
 
 	//Generate info panel
-	var infoDiv = document.createElement('div');
+	let infoDiv = document.createElement('div');
 	infoDiv.id = "infoContainer";
 	
-	var timerDiv = document.createElement('div');
+	let timerDiv = document.createElement('div');
 	timerDiv.id = "timerDiv";
 	timerDiv.className = "timerDiv";
 	timerDiv.innerHTML = "00:00:00";
 	infoDiv.appendChild(timerDiv);
 
-	var resetDiv = document.createElement('div');
+	let resetDiv = document.createElement('div');
 	resetDiv.id = "resetDiv"
 	resetDiv.className = "resetDiv";
 	resetDiv.innerHTML = "<input type='Button' id='resetBtn' value='\u{1f610}' onclick='rstBtn(this, event)' onmousedown='rstBtn(this, event)' onmouseleave='rstBtn(this, event)' onmouseover='rstBtn(this, event)'/>";
 	infoDiv.appendChild(resetDiv);
 
-	var flagsDiv = document.createElement('div');
+	let flagsDiv = document.createElement('div');
 	flagsDiv.id = "flagsDiv";
 	flagsDiv.className = "flagsDiv";
 	flagsDiv.innerHTML = totalMins;
@@ -152,14 +145,18 @@ function generateDisplay() {
 	boardDiv.appendChild(infoDiv);	//Append to boardDiv
 
 	//Generate cells
-	for (var i = 0; i < totalRows; i++) {
-		var rowDiv = document.createElement('div');
+	let rowContent = '';	//String to build the individual rows
+	for (let i = 0; i < totalRows; i++) {
+		let rowDiv = document.createElement('div');
 		rowDiv.className = "gameBoardRow";
+		rowContent = '';
 
-		for (var j = 0; j < totalCols; j++) {
+		for (let j = 0; j < totalCols; j++) {
 			//Create div for the individual cell
-			rowDiv.innerHTML += "<div class='gameBoardBtn' id='cell_"+i+"_"+j+"' row='"+i+"' col='"+j+"' onclick='play(this, event)' oncontextmenu='play(this, event)'></div>";
+			rowContent += "<div class='gameBoardBtn' id='cell_"+i+"_"+j+"' row='"+i+"' col='"+j+"' onclick='play(this, event)' oncontextmenu='play(this, event)'></div>";
 		}
+
+		rowDiv.innerHTML = rowContent;	//set the innerHTML all at once
 		boardDiv.appendChild(rowDiv);
 	}
 }
@@ -173,45 +170,101 @@ function generateBoard(initClick) {
 		var row = new Array();
 
 		for (var j = 0; j < totalCols; j++) {
-			var cell = { value: "0", mine: false, checked: false };
+			var cell = { value: 0, mine: false, checked: false };
 			row.push(cell);
 		}
 		board.push(row);
 	}
 
+	let r = 0;
+	let c = 0;
+
 	for (var i = 0; i < totalMins; i++) {
-		//get random row and column
-		do {
+		do {	//get random row and column
 			r = Math.floor(Math.random() * totalRows)
 			c = Math.floor(Math.random() * totalCols)
 			// console.log("Checking " +r+ ", " +c);
-		} while (board[r][c].mine == true || r*totalRows+c == initClick)
-		//This while calculation ensures that the initial click isnt a mine and that mines arent repeated
+		} while (board[r][c].mine == true || r*totalRows+c == initClick)	//This ensures that the initial click isnt a mine and that mines arent repeated
 
-		// console.log("Placing mine at " +r+ ", " +c)
-		board[r][c].mine = true;
-		board[r][c].value = mineChar;
-
-		//increment the cells around the mine
-		if (!isUndefined(board, r + 1, c) && board[r + 1][c].value != mineChar) { board[r + 1][c].value++; }
-		if (!isUndefined(board, r - 1, c) && board[r - 1][c].value != mineChar) { board[r - 1][c].value++; }
-		if (!isUndefined(board, r, c + 1) && board[r][c + 1].value != mineChar) { board[r][c + 1].value++; }
-		if (!isUndefined(board, r, c - 1) && board[r][c - 1].value != mineChar) { board[r][c - 1].value++; }
-		if (!isUndefined(board, r + 1, c + 1) && board[r + 1][c + 1].value != mineChar) { board[r + 1][c + 1].value++; }
-		if (!isUndefined(board, r + 1, c - 1) && board[r + 1][c - 1].value != mineChar) { board[r + 1][c - 1].value++; }
-		if (!isUndefined(board, r - 1, c + 1) && board[r - 1][c + 1].value != mineChar) { board[r - 1][c + 1].value++; }
-		if (!isUndefined(board, r - 1, c - 1) && board[r - 1][c - 1].value != mineChar) { board[r - 1][c - 1].value++; }
+		placeMineAt(r, c);	//place mine
 	}
 
 	generatedBoard = true;	//Mark the board as generated
 	// console.log(board);
 }
 function generateLbData(element, index, array) {
-	let curBoard = new Array();
+	let cur = new Array();
 	for (var i=0; i<leaderboardEntries; i++) {	//generate leaderboardEntries number of entries
-		curBoard.push({slot: i+1, name: 'AAA', time: '99:99:99'});	//Create an entry with a slot, name, and time
+		cur.push({name: 'AAA', time: '99:99:99', savedTime: 9999999});	//Create an entry with a name and times
 	}
-	array[index] = curBoard;	//add the list into the leaderboard list
+	array[index] = cur;	//add the list into the leaderboard list
+}
+function generateLbDisplay() {
+	let leadersDiv = document.getElementById('leaders');
+	let boardNumber = boardMap.get(boardSize).lb;
+
+	if (boardNumber < 0) {	//Will be -1 if we are using a custom board size
+		return;	//Don't do the rest, it will break
+	}
+
+	leadersDiv.innerHTML = '';	//Clear leaderboard
+	curBoard = leaderboards[boardNumber];
+
+	let lbTable = document.createElement('table');
+	let lbTbody = document.createElement('tbody');
+
+	//Create header column
+	for (let i=0; i<leaderboardEntries; i++) {
+		let lbRow = document.createElement('tr');	//Create row
+
+		let lbDataName = document.createElement('td');	//Create cell
+		let ldDataNameVal = document.createTextNode(curBoard[i].name);
+		lbDataName.appendChild(ldDataNameVal);
+		lbRow.appendChild(lbDataName);	//Append data to the row
+
+		let lbDataTime = document.createElement('td');	//Create cell
+		let ldDataTimeVal = document.createTextNode(curBoard[i].time);
+		lbDataTime.appendChild(ldDataTimeVal);
+		lbRow.appendChild(lbDataTime);	//Append data to the row
+
+		lbTbody.appendChild(lbRow);	//Append the row to the table body
+	}
+	lbTable.appendChild(lbTbody);	//Append the table body to the table
+	leadersDiv.appendChild(lbTable)	//Append the table to the page
+}
+function placeMineAt(r, c) {
+	// console.log("Placing mine at " +r+ ", " +c)
+	board[r][c].mine = true;
+	board[r][c].value = mineChar;
+
+	//increment the cells around the mine
+	if (!isUndefined(board, r + 1, c) && board[r + 1][c].value != mineChar) { board[r + 1][c].value++; }
+	if (!isUndefined(board, r - 1, c) && board[r - 1][c].value != mineChar) { board[r - 1][c].value++; }
+	if (!isUndefined(board, r, c + 1) && board[r][c + 1].value != mineChar) { board[r][c + 1].value++; }
+	if (!isUndefined(board, r, c - 1) && board[r][c - 1].value != mineChar) { board[r][c - 1].value++; }
+	if (!isUndefined(board, r + 1, c + 1) && board[r + 1][c + 1].value != mineChar) { board[r + 1][c + 1].value++; }
+	if (!isUndefined(board, r + 1, c - 1) && board[r + 1][c - 1].value != mineChar) { board[r + 1][c - 1].value++; }
+	if (!isUndefined(board, r - 1, c + 1) && board[r - 1][c + 1].value != mineChar) { board[r - 1][c + 1].value++; }
+	if (!isUndefined(board, r - 1, c - 1) && board[r - 1][c - 1].value != mineChar) { board[r - 1][c - 1].value++; }
+
+	updateFlagCount();
+}
+function removeMineAt(r, c) {
+	// console.log(Removing mine at " +r+ ", " +c)
+	board[r][c].mine = false;
+	board[r][c].value = "0";
+
+	//decrement the cells around the mine
+	if (!isUndefined(board, r + 1, c) && board[r + 1][c].value != mineChar) { board[r + 1][c].value--; }
+	if (!isUndefined(board, r - 1, c) && board[r - 1][c].value != mineChar) { board[r - 1][c].value--; }
+	if (!isUndefined(board, r, c + 1) && board[r][c + 1].value != mineChar) { board[r][c + 1].value--; }
+	if (!isUndefined(board, r, c - 1) && board[r][c - 1].value != mineChar) { board[r][c - 1].value--; }
+	if (!isUndefined(board, r + 1, c + 1) && board[r + 1][c + 1].value != mineChar) { board[r + 1][c + 1].value--; }
+	if (!isUndefined(board, r + 1, c - 1) && board[r + 1][c - 1].value != mineChar) { board[r + 1][c - 1].value--; }
+	if (!isUndefined(board, r - 1, c + 1) && board[r - 1][c + 1].value != mineChar) { board[r - 1][c + 1].value--; }
+	if (!isUndefined(board, r - 1, c - 1) && board[r - 1][c - 1].value != mineChar) { board[r - 1][c - 1].value--; }
+
+	updateFlagCount();
 }
 /*=============================================================================================================*/
 /* Game play */
@@ -252,14 +305,12 @@ function leftClick(clickedRow, clickedCol, clickedCell) {
 			loseEndGame();
 			return;
 		}
-		if (board[clickedRow][clickedCol].value == 0) {	//Check if blank
+		else if (board[clickedRow][clickedCol].value == 0) {	//Check if blank
 			toCheck.push({ row: clickedRow, col: clickedCol });
-			//We want to set this button to pressed, and expand until we hit the edge or numbers
-			while (toCheck.length > 0) {
-				expandEmptySpace();
-			}
+			board[clickedRow][clickedCol].checked = true;	//Set the cell to checked
+			expandEmptySpace();	//Expand until we hit the edge or numbers
 		}
-		if (board[clickedRow][clickedCol].value > 0) {	//Check if number
+		else if (board[clickedRow][clickedCol].value > 0) {	//Check if number
 			clickedCell.classList.add('pressed');
 			clickedCell.classList.add('text'+board[clickedRow][clickedCol].value);
 			clickedCell.innerHTML = board[clickedRow][clickedCol].value;
@@ -291,57 +342,46 @@ function rightClick(clickedCell) {
 	}
 }
 function expandEmptySpace() {
-	r = parseInt(toCheck[0].row, 10);
-	c = parseInt(toCheck[0].col, 10);
+	while (toCheck.length > 0) {
+		let r = toCheck[0].row;
+		let c = toCheck[0].col;
 
-	// console.log('r: ' + r);
-	// console.log('c: ' + c);	
+		toCheck.shift();	//Dequeue the first element
+		// board[r][c].checked = true;	//Set the cell to checked
+		document.getElementById('cell_' + r + '_' + c).classList.add('pressed');	//press the button by adding the class
 
-	//Dequeue the first element
-	toCheck.shift();
+		if (board[r][c].value > 0) {	//Display the value
+			document.getElementById('cell_' + r + '_' + c).innerHTML = board[r][c].value;
+			document.getElementById('cell_' + r + '_' + c).classList.add('text'+board[r][c].value);
+		}
+		else if (board[r][c].value == 0) {	//Continue expanding
+			document.getElementById('cell_' + r + '_' + c).innerHTML = "";	//Reset the value, just in case a flag exists
 
-	//Set the cell to checked
-	board[r][c].checked = true;
-
-
-	//Add the class
-	document.getElementById('cell_' + r + '_' + c).classList.add('pressed');
-
-	//Display the value
-	if (parseInt(board[r][c].value) > 0) {
-		document.getElementById('cell_' + r + '_' + c).innerHTML = board[r][c].value;
-		document.getElementById('cell_' + r + '_' + c).classList.add('text'+board[r][c].value);
+			//We want to check all of the neighbors as well
+			if (!isUndefined(board, r  , c+1) && !board[r  ][c+1].checked) { toCheck.push({ row: r  , col: c+1 }); board[r  ][c+1].checked = true; }	//N
+			if (!isUndefined(board, r+1, c+1) && !board[r+1][c+1].checked) { toCheck.push({ row: r+1, col: c+1 }); board[r+1][c+1].checked = true; }	//NE
+			if (!isUndefined(board, r+1, c  ) && !board[r+1][c  ].checked) { toCheck.push({ row: r+1, col: c   }); board[r+1][c  ].checked = true; }	//E
+			if (!isUndefined(board, r+1, c-1) && !board[r+1][c-1].checked) { toCheck.push({ row: r+1, col: c-1 }); board[r+1][c-1].checked = true; }	//SE
+			if (!isUndefined(board, r-1, c  ) && !board[r-1][c  ].checked) { toCheck.push({ row: r-1, col: c   }); board[r-1][c  ].checked = true; }	//S
+			if (!isUndefined(board, r-1, c-1) && !board[r-1][c-1].checked) { toCheck.push({ row: r-1, col: c-1 }); board[r-1][c-1].checked = true; }	//SW
+			if (!isUndefined(board, r  , c-1) && !board[r  ][c-1].checked) { toCheck.push({ row: r  , col: c-1 }); board[r  ][c-1].checked = true; }	//W
+			if (!isUndefined(board, r-1, c+1) && !board[r-1][c+1].checked) { toCheck.push({ row: r-1, col: c+1 }); board[r-1][c+1].checked = true; }	//NW
+		}
+		// console.log('Elements left to check: ' +toCheck.length);
 	}
-
-	if (board[r][c].value == 0) {
-		//Reset the value, just in case a flag exists
-		document.getElementById('cell_' + r + '_' + c).innerHTML = "";
-
-		//We want to check all of the neighbors as well
-		if (!isUndefined(board, r + 1, c) && !board[r + 1][c].checked) { toCheck.push({ row: r + 1, col: c }); board[r + 1][c].checked = true; }
-		if (!isUndefined(board, r - 1, c) && !board[r - 1][c].checked) { toCheck.push({ row: r - 1, col: c }); board[r - 1][c].checked = true; }
-		if (!isUndefined(board, r, c + 1) && !board[r][c + 1].checked) { toCheck.push({ row: r, col: c + 1 }); board[r][c + 1].checked = true; }
-		if (!isUndefined(board, r, c - 1) && !board[r][c - 1].checked) { toCheck.push({ row: r, col: c - 1 }); board[r][c - 1].checked = true; }
-		if (!isUndefined(board, r + 1, c + 1) && !board[r + 1][c + 1].checked) { toCheck.push({ row: r + 1, col: c + 1 }); board[r + 1][c + 1].checked = true; }
-		if (!isUndefined(board, r + 1, c - 1) && !board[r + 1][c - 1].checked) { toCheck.push({ row: r + 1, col: c - 1 }); board[r + 1][c - 1].checked = true; }
-		if (!isUndefined(board, r - 1, c + 1) && !board[r - 1][c + 1].checked) { toCheck.push({ row: r - 1, col: c + 1 }); board[r - 1][c + 1].checked = true; }
-		if (!isUndefined(board, r - 1, c - 1) && !board[r - 1][c - 1].checked) { toCheck.push({ row: r - 1, col: c - 1 }); board[r - 1][c - 1].checked = true; }
-	}
-	// console.log('Elements left to check: ' +toCheck.length);
-	// console.log(toCheck[0].row + ' ' + toCheck[0].col);
 }
 function updateFlagCount() {
-	var foundFlags = 0;
+	let foundFlags = 0;
 
-	for (var i = 0; i < totalRows; i++) {
-		for (var j = 0; j < totalCols; j++) {
-			var c = document.getElementById('cell_' + i + '_' + j);
+	for (let i = 0; i < totalRows; i++) {
+		for (let j = 0; j < totalCols; j++) {
+			let c = document.getElementById('cell_' + i + '_' + j);
 			if (c.innerHTML == flagChar || (c.innerHTML == mineChar && !c.classList.contains('exploded')))
 				foundFlags++;
 		}
 	}
 
-	var flagsLeft = totalMins - foundFlags;
+	let flagsLeft = totalMins - foundFlags;
 
 	document.getElementById('flagsDiv').innerHTML = flagsLeft;
 }
@@ -350,13 +390,10 @@ function updateFlagCount() {
 function checkWin() {
 	var unpressedCells = 0;
 
-	for (var i = 0; i < totalRows; i++) {
+	for (var i=0; i<totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
 			var cur = document.getElementById('cell_'+i+'_'+j);
 			if (!cur.classList.contains('pressed') && !cur.classList.contains('exploded')) {	//We dont want to count pressed or exploded cells
-				unpressedCells++;
-			}
-			else if (cur.value == flagChar) {	//This is unnecessary, as flagged cells will not be pressed. Including for completionism
 				unpressedCells++;
 			}
 		}
@@ -373,7 +410,27 @@ function checkWin() {
 		document.getElementById("alertPanel").innerHTML = 'You won!';	//Set alertPanel
 		setBtn(boardMap.get(boardSize.toString()).winFace);	//Set btn to appropriate face
 
-		//Attempt to add to leaderboard
+		checkSaveTime();	//Attempt to add to leaderboard
+	}
+}
+function checkSaveTime() {
+	let place = 0;	//The place that the new time will take
+	
+	for (let i=curBoard.length; i>0; i--) {
+		if (savedTime <= curBoard[i-1].savedTime) {	//Check if new time was faster than the leaderboard time
+			place = i;	//Set the place
+		}
+		else { //Not good enough for the leaderboards
+			return;	//We can leave
+		}
+	}
+
+	if (place <= curBoard.length) {	//We need to add it to the leaderboard
+		curBoard.splice(place-1, 0, {name: document.getElementById('userName').value, time: document.getElementById('timerDiv').innerHTML, savedTime: savedTime});	//Add entry in the correct slot
+		let loser = curBoard.pop();	//Remove the last place from the leaderboard
+		leaderboards.splice(boardMap.get(boardSize).lb, 1, curBoard);	//update leaderboards array
+		localStorage.setItem('boards', JSON.stringify(leaderboards));	//save leaderboards array to local storage
+		generateLbDisplay();	//Update leaderboard on screen
 	}
 }
 function loseEndGame() {
@@ -435,9 +492,9 @@ function disableBoard() {
 	board = new Array();	//clear the board variable
 }
 function displayMines() {
-	for (var i = 0; i < totalRows; i++) {
-		for (var j = 0; j < totalCols; j++) {
-			var cur = document.getElementById('cell_' + i + '_' + j);
+	for (let i = 0; i < totalRows; i++) {
+		for (let j = 0; j < totalCols; j++) {
+			let cur = document.getElementById('cell_' + i + '_' + j);
 			if (!cur.classList.contains('pressed') && cur.innerHTML == "" && board[i][j].mine) {
 				cur.innerHTML = board[i][j].value;	//display the value of the board at the current location
 				cur.classList.add('textF');

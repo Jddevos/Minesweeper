@@ -17,6 +17,9 @@ An HTML/JS game of minesweeper
 - Code comments
 - Code standardization
 - Input numbers can scroll
+- ExpandEmptySpace is being called too many times
+- Verify all parseints are necessary
+- Verify toStrings are necessary
 
 
 
