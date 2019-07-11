@@ -5,7 +5,6 @@ An HTML/JS game of minesweeper
 
 
 #### To-Do
-- boardNumber is changing in generateLbDisplay?
 - Leaderboard styling
 - Settings panel
     - Flag, mine, and question character selection
@@ -13,10 +12,6 @@ An HTML/JS game of minesweeper
     - Colors?
 - Code comments
 - Code standardization
-- Eliminate either curboard OR leaderboards variables
-    - Replace `curBoard` with `leaderboards[boardMap.get(boardSize).lb]` ?
-    - Only pull in the `curBoard`, and do not hold on to leaderboards ?
-- Sensically rename functions
 
 
 

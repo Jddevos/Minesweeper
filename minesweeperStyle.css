@@ -1,8 +1,4 @@
 /* ELEMENTS */
-body {
-	/* align-content: center;
-	text-align: center; */
-}	
 button {
     margin: -1px;
 	padding: -1px;
@@ -38,7 +34,10 @@ input[type=number]::-webkit-outer-spin-button {
 	-ms-user-select: none;
 	user-select: none;
 }
-#leaders {}
+#leaders {
+	/* this is only here to stop the errors */
+	border: none;
+}
 #settings {
 	display: block;
 }
@@ -51,7 +50,10 @@ input[type=number]::-webkit-outer-spin-button {
 	justify-content: space-between;
 	align-items: flex-start;
 }
-.child {}
+.child {
+	/* this is only here to stop the errors */
+	border: none;
+}
 .disabled {
 	pointer-events: none;
 }
@@ -89,7 +91,6 @@ input[type=number]::-webkit-outer-spin-button {
 	display: inline-block;
 }
 .input {
-	/* height: 0.65rem; */
 	display: inline-block;
 	overflow: hidden;
 }

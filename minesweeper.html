@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en">
-	<meta charset="UTF-8">
 	<head>
+		<meta charset="UTF-8">
 		<title>Minesweeper</title>
+		<meta charset="UTF-8">
 		<link rel="stylesheet" href="minesweeperStyle.css" />
 		<script src="minesweeper.js"></script>
-		<script src="storage.js"></script>
 	</head>
 	<body onload="pageLoad()">
 		<form autocomplete="off" id="settings">
@@ -15,7 +15,7 @@
 			X:<input type="radio" name="size" value="xl" onchange="changeSize()">
 			C:<input type="radio" name="size" value="cu" onchange="changeSize()">
 			<span>&#124;&#124;</span>
-			<!-- 35x75_2600 max size -->
+			<!-- 35x75_2600 max size the fits nicely on screen -->
 			R:<input type="number" name="rows" id="rows" min="8" max="999" value="9" class="input number">
 			C:<input type="number" name="cols" id="cols" min="8" max="999" value="9" class="input number">
 			M:<input type="number" name="mines" id="mines" min="8" max="9999" value="10" class="input number">
