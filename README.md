@@ -4,22 +4,19 @@ An HTML/JS game of minesweeper
 
 
 
-#### Desired Features
-- Local high scores
+#### To-Do
+- boardNumber is changing in generateLbDisplay?
+- Leaderboard styling
 - Settings panel
     - Flag, mine, and question character selection
     - Accuracy of timer
     - Colors?
-
-
-
-#### Bug Fixes
 - Code comments
 - Code standardization
-- Input numbers can scroll
-- ExpandEmptySpace is being called too many times
-- Verify all parseints are necessary
-- Verify toStrings are necessary
+- Eliminate either curboard OR leaderboards variables
+    - Replace `curBoard` with `leaderboards[boardMap.get(boardSize).lb]` ?
+    - Only pull in the `curBoard`, and do not hold on to leaderboards ?
+- Sensically rename functions
 
 
 
@@ -31,3 +28,4 @@ An HTML/JS game of minesweeper
 - Reset button dynamically changes
 - Custom size options
 - Things are wonky when flagChar is set to an emoji (&#128681)
+- Local high scores

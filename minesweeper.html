@@ -9,11 +9,11 @@
 	</head>
 	<body onload="pageLoad()">
 		<form autocomplete="off" id="settings">
-			S:<input type="radio" name="size" value="sm" onchange="start()" checked="checked">
-			M:<input type="radio" name="size" value="md" onchange="start()">
-			L:<input type="radio" name="size" value="lg" onchange="start()">
-			X:<input type="radio" name="size" value="xl" onchange="start()">
-			C:<input type="radio" name="size" value="cu" onchange="start()">
+			S:<input type="radio" name="size" value="sm" onchange="changeSize()" checked="checked">
+			M:<input type="radio" name="size" value="md" onchange="changeSize()">
+			L:<input type="radio" name="size" value="lg" onchange="changeSize()">
+			X:<input type="radio" name="size" value="xl" onchange="changeSize()">
+			C:<input type="radio" name="size" value="cu" onchange="changeSize()">
 			<span>&#124;&#124;</span>
 			<!-- 35x75_2600 max size -->
 			R:<input type="number" name="rows" id="rows" min="8" max="999" value="9" class="input number">

@@ -1,6 +1,6 @@
 /* Global variables */
-var board   = new Array();	//This will hold the game board in its entirety
-var toCheck = new Array();	//Will hold the list of cells to check when expanding empty space
+var board   = [];	//This will hold the game board in its entirety
+var toCheck = [];	//Will hold the list of cells to check when expanding empty space
 var totalRows = 0;			//Total number of rows
 var totalCols = 0;			//Total number of columns
 var totalMins = 0;			//Total number of mines
@@ -17,13 +17,13 @@ const wronChar = "\u{1f4a2}";	//Character to display when a flag is incorrect af
 const explChar = "\u{1f4a5}";	//Character to display when a mine is clicked
 
 /* Board sizes */
-var sm = {rows:  8, cols:  8, mines:  10, lb:  0, winFace: '\u{1f642}'};	//8x8_10, Slightly Smiling Face
-var md = {rows: 16, cols: 16, mines:  40, lb:  1, winFace: '\u{1f60a}'};	//16x16_40, Smiling Face With Smiling Eyes
-var lg = {rows: 16, cols: 30, mines:  99, lb:  2, winFace: '\u{1f929}'};	//16x30_99, Star-Struck
-var xl = {rows: 24, cols: 30, mines: 225, lb:  3, winFace: '\u{1f913}'};	//24x30_225, Nerd Face
-var cu = {rows:  8, cols:  8, mines:  10, lb: -1, winFace: '\u{1f636}'};	//Face Without Mouth
+const sm = {rows:  8, cols:  8, mines:  10, lb:  0, winFace: '\u{1f642}'};	//8x8_10, Slightly Smiling Face
+const md = {rows: 16, cols: 16, mines:  40, lb:  1, winFace: '\u{1f60a}'};	//16x16_40, Smiling Face With Smiling Eyes
+const lg = {rows: 16, cols: 30, mines:  99, lb:  2, winFace: '\u{1f929}'};	//16x30_99, Star-Struck
+const xl = {rows: 24, cols: 30, mines: 225, lb:  3, winFace: '\u{1f913}'};	//24x30_225, Nerd Face
+const cu = {rows:  8, cols:  8, mines:  10, lb: -1, winFace: '\u{1f636}'};	//Face Without Mouth
 
-var boardMap = new Map();
+const boardMap = new Map();
 boardMap.set("sm", sm);
 boardMap.set("md", md);
 boardMap.set("lg", lg);
@@ -36,13 +36,13 @@ var mdBoard = [];		//medium leaderboard
 var lgBoard = [];		//large leaderboard
 var xlBoard = [];		//extra large leaderboard
 
+const leaderboardEntries = 5;		//How many high scores to keep on each leaderboard
 var leaderboards = [smBoard,mdBoard,lgBoard,xlBoard];
 var curBoard = [];	//The leaderboard for the currently selected size
-const leaderboardEntries = 5;		//How many high scores to keep on each leaderboard
 
 document.oncontextmenu = function () {
 	return false;	//This disables the right click context menu
-}
+};
 /*=============================================================================================================*/
 /* Before the game starts */
 function pageLoad() {
@@ -58,8 +58,6 @@ function pageLoad() {
 
 
 	//leaderboards
-	var leaderDiv = document.getElementById('leaders');	//Grab the div
-
 	if (localStorage.getItem('boards')) {	//check if the boards local storage already exists
 		// console.log('Loading leaderboards from localStorage');
 		leaderboards = JSON.parse(localStorage.getItem('boards'));	//if it does, load it into the leaderboards var
@@ -73,9 +71,9 @@ function pageLoad() {
 }
 function start() {
 	clearAlerts();	//Clear any alerts
-	boardSize = document.querySelector('input[name="size"]:checked').value;	//pull the value out of the selected radio button
 
 	if (boardSize == 'cu') {	//custom size board
+		console.log('Custom size board');
 		//We need to make the input areas editable
 		document.getElementById("rows").disabled = false;
 		document.getElementById("cols").disabled = false;
@@ -93,9 +91,9 @@ function start() {
 		document.getElementById("mines").disabled = true;
 
 		//Set the totalRows, totalCols, and totalMins variables
-		totalRows = boardMap.get(boardSize.toString()).rows;
-		totalCols = boardMap.get(boardSize.toString()).cols;
-		totalMins = boardMap.get(boardSize.toString()).mines;
+		totalRows = boardMap.get(boardSize).rows;
+		totalCols = boardMap.get(boardSize).cols;
+		totalMins = boardMap.get(boardSize).mines;
 
 		//Set the input boxes so that they match whatever the current selection is
 		document.getElementById("rows").value = totalRows;
@@ -131,7 +129,7 @@ function generateDisplay() {
 	infoDiv.appendChild(timerDiv);
 
 	let resetDiv = document.createElement('div');
-	resetDiv.id = "resetDiv"
+	resetDiv.id = "resetDiv";
 	resetDiv.className = "resetDiv";
 	resetDiv.innerHTML = "<input type='Button' id='resetBtn' value='\u{1f610}' onclick='rstBtn(this, event)' onmousedown='rstBtn(this, event)' onmouseleave='rstBtn(this, event)' onmouseover='rstBtn(this, event)'/>";
 	infoDiv.appendChild(resetDiv);
@@ -164,10 +162,10 @@ function generateBoard(initClick) {
 	//Parameters are the initial click. We need to avoid generating mines there
 	// console.log("initClick: " +initClick);
 
-	board = new Array();	//Clear the board
+	board = [];	//Clear the board
 
 	for (var i = 0; i < totalRows; i++) {
-		var row = new Array();
+		var row = [];
 
 		for (var j = 0; j < totalCols; j++) {
 			var cell = { value: 0, mine: false, checked: false };
@@ -179,12 +177,12 @@ function generateBoard(initClick) {
 	let r = 0;
 	let c = 0;
 
-	for (var i = 0; i < totalMins; i++) {
+	for (let i = 0; i < totalMins; i++) {
 		do {	//get random row and column
-			r = Math.floor(Math.random() * totalRows)
-			c = Math.floor(Math.random() * totalCols)
+			r = Math.floor(Math.random() * totalRows);
+			c = Math.floor(Math.random() * totalCols);
 			// console.log("Checking " +r+ ", " +c);
-		} while (board[r][c].mine == true || r*totalRows+c == initClick)	//This ensures that the initial click isnt a mine and that mines arent repeated
+		} while (board[r][c].mine == true || r*totalRows+c == initClick);	//This ensures that the initial click isnt a mine and that mines arent repeated
 
 		placeMineAt(r, c);	//place mine
 	}
@@ -193,23 +191,24 @@ function generateBoard(initClick) {
 	// console.log(board);
 }
 function generateLbData(element, index, array) {
-	let cur = new Array();
+	let cur = [];
 	for (var i=0; i<leaderboardEntries; i++) {	//generate leaderboardEntries number of entries
 		cur.push({name: 'AAA', time: '99:99:99', savedTime: 9999999});	//Create an entry with a name and times
 	}
 	array[index] = cur;	//add the list into the leaderboard list
 }
 function generateLbDisplay() {
-	let leadersDiv = document.getElementById('leaders');
+	boardSize = document.querySelector('input[name="size"]:checked').value;	//pull the value out of the selected radio button
 	let boardNumber = boardMap.get(boardSize).lb;
 
 	if (boardNumber < 0) {	//Will be -1 if we are using a custom board size
 		return;	//Don't do the rest, it will break
 	}
 
+	let leadersDiv = document.getElementById('leaders');
 	leadersDiv.innerHTML = '';	//Clear leaderboard
 	curBoard = leaderboards[boardNumber];
-
+	
 	let lbTable = document.createElement('table');
 	let lbTbody = document.createElement('tbody');
 
@@ -230,7 +229,7 @@ function generateLbDisplay() {
 		lbTbody.appendChild(lbRow);	//Append the row to the table body
 	}
 	lbTable.appendChild(lbTbody);	//Append the table body to the table
-	leadersDiv.appendChild(lbTable)	//Append the table to the page
+	leadersDiv.appendChild(lbTable);	//Append the table to the page
 }
 function placeMineAt(r, c) {
 	// console.log("Placing mine at " +r+ ", " +c)
@@ -408,7 +407,7 @@ function checkWin() {
 		disableBoard();
 
 		document.getElementById("alertPanel").innerHTML = 'You won!';	//Set alertPanel
-		setBtn(boardMap.get(boardSize.toString()).winFace);	//Set btn to appropriate face
+		setBtn(boardMap.get(boardSize).winFace);	//Set btn to appropriate face
 
 		checkSaveTime();	//Attempt to add to leaderboard
 	}
@@ -426,11 +425,14 @@ function checkSaveTime() {
 	}
 
 	if (place <= curBoard.length) {	//We need to add it to the leaderboard
-		curBoard.splice(place-1, 0, {name: document.getElementById('userName').value, time: document.getElementById('timerDiv').innerHTML, savedTime: savedTime});	//Add entry in the correct slot
-		let loser = curBoard.pop();	//Remove the last place from the leaderboard
+		let userName = document.getElementById('userName').value;
+		let finalTime = document.getElementById('timerDiv').innerHTML;
+		curBoard.splice(place-1, 0, {name: userName, time: finalTime, savedTime: savedTime});	//Add entry in the correct slot
+		curBoard.pop();	//Remove the last place from the leaderboard
 		leaderboards.splice(boardMap.get(boardSize).lb, 1, curBoard);	//update leaderboards array
 		localStorage.setItem('boards', JSON.stringify(leaderboards));	//save leaderboards array to local storage
 		generateLbDisplay();	//Update leaderboard on screen
+		window.alert('Congrats! You placed in the top '+leaderboardEntries+' with a time of '+finalTime+'!');
 	}
 }
 function loseEndGame() {
@@ -489,7 +491,7 @@ function disableBoard() {
 			curCell.classList.add('disabled');	//Disable the cell by adding the disabled class
 		}
 	}
-	board = new Array();	//clear the board variable
+	board = [];	//clear the board variable
 }
 function displayMines() {
 	for (let i = 0; i < totalRows; i++) {
@@ -513,4 +515,12 @@ function isUndefined(_arr, _index1, _index2) {
 function setBtn(emojiCode) {
 	document.getElementById("resetBtn").value = emojiCode;
 	btnValue = emojiCode;
+}
+function changeName() {
+	localStorage.setItem('userName', document.getElementById('userName').value);	//Save changes to userName
+}
+function changeSize() {
+	boardSize = document.querySelector('input[name="size"]:checked').value;	//pull the value out of the selected radio button
+	generateLbDisplay();	//Redraw leaderboard
+	start();	//Call Start
 }
