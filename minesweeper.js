@@ -24,16 +24,17 @@ var totalRows = 0;	//Total number of rows
 var totalCols = 0;	//Total number of columns
 var totalMins = 0;	//Total number of mines
 var boardSize = 'sm';	//The size of the board
-var generatedBoard = false;	//Has the board been generated yet?
 var priorRstBtnVal = face_default;	//Will hold the value of the reset button
+var turnsTaken = 0;	//Will hold the total number of turns taken
 
 /* Board sizes */
-const sm = {rows:  8, cols:  8, mines:  10};	//8x8_10
-const md = {rows: 16, cols: 16, mines:  40};	//16x16_40
-const lg = {rows: 16, cols: 30, mines:  99};	//16x30_99
-const xl = {rows: 24, cols: 30, mines: 225};	//24x30_225
-const cu = {rows:  8, cols:  8, mines:  10};
-const boardMap = new Map([['sm',sm],['md',md],['lg',lg],['xl',xl],['cu',cu]]);
+const boardMap = new Map([
+	['sm',{rows:  8, cols:  8, mines:  10}],
+	['md',{rows: 16, cols: 16, mines:  40}],
+	['lg',{rows: 16, cols: 30, mines:  99}],
+	['xl',{rows: 24, cols: 30, mines: 225}],
+	['cu',{rows:  8, cols:  8, mines:  10}]
+]);
 
 /* Storage */
 const leaderboardEntries = 20;		//How many high scores to keep on each leaderboard
@@ -43,6 +44,7 @@ var curBoard = [];	//The leaderboard for the currently selected size
 document.oncontextmenu = function () {
 	return false;	//This disables the right click context menu
 };
+
 /*=============================================================================================================*/
 /* Before the game starts */
 function pageLoad() {
@@ -61,9 +63,9 @@ function pageLoad() {
 }
 function start() {
 	setAlerts('');	//Clear any alerts
+	turnsTaken = 0;	//Reset turnsTaken
 
 	if (boardSize == 'cu') {	//custom size board
-		console.log('Custom size board');
 		//We need to make the input areas editable
 		document.getElementById('rows').disabled = false;
 		document.getElementById('cols').disabled = false;
@@ -91,7 +93,8 @@ function start() {
 		document.getElementById('mines').value = totalMins;
 	}
 	
-	generatedBoard = false;	//Set this to false so that the board will be regenerated
+	generateGameBoardData();	//generate the game board data
+	
 	if (document.getElementById('settings').checkValidity()) {	//If everything is valid, proceed
 		generateGameBoardDisplay();	//redraw the board
 		resetTimer();	//reset timer to 0
@@ -101,36 +104,18 @@ function start() {
 		setBtn(face_error);	//Dizzy Face
 	}
 }
-function generateGameBoardData(initClick) {
-	//Parameters are the initial click. We need to avoid generating mines there
-	// console.log('initClick: ' +initClick);
-
+function generateGameBoardData() {
 	board = [];	//Clear the board
 
 	for (var i = 0; i < totalRows; i++) {
 		var row = [];
-
 		for (var j = 0; j < totalCols; j++) {
 			var cell = { value: 0, mine: false, checked: false };
 			row.push(cell);
 		}
 		board.push(row);
 	}
-
-	let r = 0;
-	let c = 0;
-
-	for (let i = 0; i < totalMins; i++) {
-		do {	//get random row and column
-			r = Math.floor(Math.random() * totalRows);
-			c = Math.floor(Math.random() * totalCols);
-			// console.log('Checking ' +r+ ', ' +c);
-		} while (board[r][c].mine == true || r*totalRows+c == initClick);	//This ensures that the initial click isnt a mine and that mines arent repeated
-
-		placeMineAt(r, c);	//place mine
-	}
-
-	generatedBoard = true;	//Mark the board as generated
+	placeMines(totalMins);	//place totalMins mines
 	// console.log(board);
 }
 function generateGameBoardDisplay() {
@@ -173,12 +158,12 @@ function generateGameBoardDisplay() {
 
 	//Generate cells
 	let rowContent = '';	//String to build the individual rows
-	for (let i = 0; i < totalRows; i++) {
+	for (let i=0; i<totalRows; i++) {
 		let rowDiv = document.createElement('div');
 		rowDiv.className = 'gameBoardRow';
 		rowContent = '';
 
-		for (let j = 0; j < totalCols; j++) {
+		for (let j=0; j<totalCols; j++) {
 			//Create div for the individual cell
 			rowContent += '<div class=\'gameBoardBtn\' id=\'cell_'+i+'_'+j+'\' row=\''+i+'\' col=\''+j+'\' onclick=\'play(this, event)\' oncontextmenu=\'play(this, event)\'></div>';
 		}
@@ -200,13 +185,14 @@ function generateLeaderBoardData() {
 }
 function generateLeaderBoardDisplay() {
 	boardSize = document.querySelector('input[name=\'size\']:checked').value;	//pull the value out of the selected radio button
-
-	if (boardSize == 'cu') {	//Check for custom board size
-		return;	//Don't do the rest, it will break
-	}
-
 	let leadersDiv = document.getElementById('leaders');
 	leadersDiv.innerHTML = '';	//Clear leaderboard
+
+	if (boardSize == 'cu') {	//Check for custom board size
+		curBoard = [];	//Clear the current leaderboard
+		leadersDiv.innerHTML = 'Custom sized boards don\'t have leaderboards!';
+		return;	//Don't do the rest, it will break
+	}
 	
 	let lbTable = document.createElement('table');
 	let lbTbody = document.createElement('tbody');
@@ -230,55 +216,73 @@ function generateLeaderBoardDisplay() {
 	lbTable.appendChild(lbTbody);	//Append the table body to the table
 	leadersDiv.appendChild(lbTable);	//Append the table to the page
 }
+function placeMines(minesToPlace) {
+	let r = 0;
+	let c = 0;
+	for (let i=0; i<minesToPlace; i++) {
+		do {	//get random row and column
+			r = Math.floor(Math.random() * totalRows);
+			c = Math.floor(Math.random() * totalCols);
+		} while (board[r][c].mine == true);	//make sure that mines arent repeated
+		placeMineAt(r, c);	//place mine
+	}
+}
 function placeMineAt(r, c) {
-	// console.log('Placing mine at ' +r+ ', ' +c)
+	// console.log('Placing mine at '+r+', '+c);
 	board[r][c].mine = true;
-	board[r][c].value = sym_mine;
 
 	//increment the cells around the mine
-	if (!isUndefined(board, r+1, c  ) && board[r+1][c  ].value != sym_mine) { board[r+1][c  ].value++; }
-	if (!isUndefined(board, r-1, c  ) && board[r-1][c  ].value != sym_mine) { board[r-1][c  ].value++; }
-	if (!isUndefined(board, r  , c+1) && board[r  ][c+1].value != sym_mine) { board[r  ][c+1].value++; }
-	if (!isUndefined(board, r  , c-1) && board[r  ][c-1].value != sym_mine) { board[r  ][c-1].value++; }
-	if (!isUndefined(board, r+1, c+1) && board[r+1][c+1].value != sym_mine) { board[r+1][c+1].value++; }
-	if (!isUndefined(board, r+1, c-1) && board[r+1][c-1].value != sym_mine) { board[r+1][c-1].value++; }
-	if (!isUndefined(board, r-1, c+1) && board[r-1][c+1].value != sym_mine) { board[r-1][c+1].value++; }
-	if (!isUndefined(board, r-1, c-1) && board[r-1][c-1].value != sym_mine) { board[r-1][c-1].value++; }
-
-	updateFlagCount();
+	if (!isUndefined(board, r+1, c  )) { board[r+1][c  ].value++; }		// && !board[r+1][c  ].mine
+	if (!isUndefined(board, r-1, c  )) { board[r-1][c  ].value++; }		// && !board[r-1][c  ].mine
+	if (!isUndefined(board, r  , c+1)) { board[r  ][c+1].value++; }		// && !board[r  ][c+1].mine
+	if (!isUndefined(board, r  , c-1)) { board[r  ][c-1].value++; }		// && !board[r  ][c-1].mine
+	if (!isUndefined(board, r+1, c+1)) { board[r+1][c+1].value++; }		// && !board[r+1][c+1].mine
+	if (!isUndefined(board, r+1, c-1)) { board[r+1][c-1].value++; }		// && !board[r+1][c-1].mine
+	if (!isUndefined(board, r-1, c+1)) { board[r-1][c+1].value++; }		// && !board[r-1][c+1].mine
+	if (!isUndefined(board, r-1, c-1)) { board[r-1][c-1].value++; }		// && !board[r-1][c-1].mine
 }
 function removeMineAt(r, c) {
-	// console.log(Removing mine at ' +r+ ', ' +c)
+	// console.log('Removing mine at '+r+ ', ' +c);
 	board[r][c].mine = false;	//set it to not a mine
-	board[r][c].value = 0;		//change the value to 0
 
+	board[r][c].value = 0;	//reset value to 0
 	//decrement the cells around the mine
-	if (!isUndefined(board, r+1, c  ) && board[r+1][c  ].value != sym_mine) { board[r+1][c  ].value--; }
-	if (!isUndefined(board, r-1, c  ) && board[r-1][c  ].value != sym_mine) { board[r-1][c  ].value--; }
-	if (!isUndefined(board, r  , c+1) && board[r  ][c+1].value != sym_mine) { board[r  ][c+1].value--; }
-	if (!isUndefined(board, r  , c-1) && board[r  ][c-1].value != sym_mine) { board[r  ][c-1].value--; }
-	if (!isUndefined(board, r+1, c+1) && board[r+1][c+1].value != sym_mine) { board[r+1][c+1].value--; }
-	if (!isUndefined(board, r+1, c-1) && board[r+1][c-1].value != sym_mine) { board[r+1][c-1].value--; }
-	if (!isUndefined(board, r-1, c+1) && board[r-1][c+1].value != sym_mine) { board[r-1][c+1].value--; }
-	if (!isUndefined(board, r-1, c-1) && board[r-1][c-1].value != sym_mine) { board[r-1][c-1].value--; }
+	if (!isUndefined(board, r+1, c  )) { board[r+1][c  ].value--; }
+	if (!isUndefined(board, r-1, c  )) { board[r-1][c  ].value--; }
+	if (!isUndefined(board, r  , c+1)) { board[r  ][c+1].value--; }
+	if (!isUndefined(board, r  , c-1)) { board[r  ][c-1].value--; }
+	if (!isUndefined(board, r+1, c+1)) { board[r+1][c+1].value--; }
+	if (!isUndefined(board, r+1, c-1)) { board[r+1][c-1].value--; }
+	if (!isUndefined(board, r-1, c+1)) { board[r-1][c+1].value--; }
+	if (!isUndefined(board, r-1, c-1)) { board[r-1][c-1].value--; }
 
-	updateFlagCount();
+	//calculate the new value
+	if (!isUndefined(board, r+1, c  ) && board[r+1][c  ].mine) { board[r][c].value++; }
+	if (!isUndefined(board, r-1, c  ) && board[r-1][c  ].mine) { board[r][c].value++; }
+	if (!isUndefined(board, r  , c+1) && board[r  ][c+1].mine) { board[r][c].value++; }
+	if (!isUndefined(board, r  , c-1) && board[r  ][c-1].mine) { board[r][c].value++; }
+	if (!isUndefined(board, r+1, c+1) && board[r+1][c+1].mine) { board[r][c].value++; }
+	if (!isUndefined(board, r+1, c-1) && board[r+1][c-1].mine) { board[r][c].value++; }
+	if (!isUndefined(board, r-1, c+1) && board[r-1][c+1].mine) { board[r][c].value++; }
+	if (!isUndefined(board, r-1, c-1) && board[r-1][c-1].mine) { board[r][c].value++; }
+
+	placeMines(1);	//put a new mine somewhere to replace the one we got rid of
 }
 /*=============================================================================================================*/
 /* Game play */
 function play(ele, event) {
 	var clickedRow = Math.round(ele.getAttribute('row'));
 	var clickedCol = Math.round(ele.getAttribute('col'));
-	var clickedCell = document.getElementById('cell_' + clickedRow + '_' + clickedCol);
-
+	var clickedCell = document.getElementById('cell_'+clickedRow+'_'+clickedCol);
 	// console.log('row: '+clickedRow+', col: '+clickedCol);
 
-	if (!generatedBoard) {	//We need to generate the board if it doesnt already exist
-		var initCell = Math.round(clickedRow*totalRows+clickedCol);
-		// console.log('Num: '+initCell);
-		generateGameBoardData(initCell);
+	if (turnsTaken == 0) {	//check if this is the first turn
+		if (board[clickedRow][clickedCol].mine) {	//check if we clicked on a mine
+			removeMineAt(clickedRow, clickedCol);	//remove the mine we clicked
+		}
 	}
 
+	undoPrintBoard();	//Run this function, just in case printBoard() has been ran
 	startTimer(); //Start the timer, if it isnt already
 
 	if (event.type == 'click') {	//Left click
@@ -289,14 +293,14 @@ function play(ele, event) {
 		// console.log('Right click at '+clickedRow+', '+clickedCol);
 		rightClick(clickedCell);
 	}
-	updateFlagCount();
+	turnsTaken++;	//Increment turnsTaken
+	updateFlagCount();	//Update the flag count
 	checkWin();	//Check for win
 }
 function leftClick(clickedRow, clickedCol, clickedCell) {
 	setBtn(face_default);	//Neutral Face
 
-	//Check for a value already being here
-	if (clickedCell.innerHTML == '') {	//If there is not anything already there, we can take action
+	if (clickedCell.innerHTML != sym_flag && clickedCell.innerHTML != sym_ques) {	//If there is not anything already there, we can take action
 		if (board[clickedRow][clickedCol].mine) {	//Check for Lose
 			board[clickedRow][clickedCol].value = sym_expl;	//set value of clicked cell to the sym_expl
 			clickedCell.classList.add('textM');	//add the appropriate class
@@ -371,9 +375,9 @@ function expandEmptySpace() {
 function updateFlagCount() {
 	let foundFlags = 0;
 
-	for (let i = 0; i < totalRows; i++) {
-		for (let j = 0; j < totalCols; j++) {
-			let c = document.getElementById('cell_' + i + '_' + j);
+	for (let i=0; i<totalRows; i++) {
+		for (let j=0; j<totalCols; j++) {
+			let c = document.getElementById('cell_'+i+'_'+j);
 			if (c.innerHTML == sym_flag || (c.innerHTML == sym_mine && !c.classList.contains('exploded')))
 				foundFlags++;
 		}
@@ -439,8 +443,8 @@ function loseEndGame() {
 
 			//Explode the unmarked mines
 			if (board[i][j].mine && curCell.innerHTML != sym_flag) {
-				// console.log('Setting cell_'+i+'_'+j+' to '+board[i][j].value);
-				curCell.innerHTML = board[i][j].value;
+				// console.log('Setting cell_'+i+'_'+j+' to '+sym_mine);
+				curCell.innerHTML = sym_mine;
 				curCell.classList.add('exploded');
 			}
 
@@ -490,7 +494,7 @@ function disableBoard() {
 	board = [];	//clear the board variable
 }
 function displayMines() {
-	if (!generatedBoard) {	//Check if this is being called before the board has been generated
+	if (board.length == 0) {	//Check if this is being called before the board has been generated
 		generateGameBoardData(0);	//Create the board real quick to avoid errors
 	}
 	for (let i=0; i<totalRows; i++) {	//Loop through every row
@@ -522,4 +526,29 @@ function changeSize() {
 	generateLeaderBoardData();	//Import{slash}create leaderboard for correct size
 	generateLeaderBoardDisplay();	//Redraw leaderboard
 	start();	//Call Start
+}
+function printBoard() {
+	for (let i=0; i<totalRows; i++) {	//Loop through every row
+		for (let j=0; j<totalCols; j++) {	//Loop through every column
+			let cur = document.getElementById('cell_'+i+'_'+j);
+			if (!cur.classList.contains('pressed') && cur.innerHTML != sym_flag && cur.innerHTML != sym_ques) {
+				cur.innerHTML = board[i][j].value;
+			}
+			if (board[i][j].mine && cur.innerHTML != sym_flag && cur.innerHTML != sym_ques) {
+				cur.classList.add('exploded');
+			}
+		}
+	}		
+}
+function undoPrintBoard() {
+	for (let i=0; i<totalRows; i++) {	//Loop through every row
+		for (let j=0; j<totalCols; j++) {	//Loop through every column
+			let cur = document.getElementById('cell_'+i+'_'+j);
+
+			if (cur.innerHTML == board[i][j].value && !cur.classList.contains('pressed')) {	//detect if we've used the printBoard function
+				cur.innerHTML = '';	//remove it
+				cur.classList.remove('exploded');	//remove the exploded class if it is there
+			}
+		}
+	}		
 }
