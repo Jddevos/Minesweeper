@@ -1,10 +1,17 @@
-/* ELEMENTS */
+/* DOM STYLING */
 button {
     margin: -1px;
 	padding: -1px;
 }
 html {
 	font-family: Arial, Helvetica, sans-serif;
+	overflow-x: auto;
+	overflow-y: auto;
+}
+
+/* SETTINGS STYLING */
+#settings {
+	display: block;
 }
 input[type=number] {
 	/* Hide input spinners in Firefox */
@@ -16,17 +23,33 @@ input[type=number]::-webkit-outer-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
 }
-
-
-/* IDS */
-#alertPanel {
-	margin: 5px;
-	padding: 5px;
+.inputArea {
+	display: inline-block;
 }
+.input {
+	display: inline-block;
+	overflow: hidden;
+}
+.number {
+	width: 30px;
+}
+
+/* MAIN AREA STYLING */
+#boardColumn {
+	display: inline-block;
+	vertical-align: top;
+	min-width: 50%;
+	padding: 1rem;
+}
+#leaders {
+	display: inline-block;
+}
+
+/* BOARD STYLING */
 #board {
-	/* display: inline-block; */
+	display: inline-block;
 	border: 2px solid black;
-	margin-top: 1rem;
+	white-space: nowrap;
 
 	/* disable highlighting of the board */
 	-moz-user-select: none;
@@ -34,37 +57,11 @@ input[type=number]::-webkit-outer-spin-button {
 	-ms-user-select: none;
 	user-select: none;
 }
-#leaders {
-	/* this is only here to stop the errors */
-	border: none;
-}
-#settings {
+.gameBoardRow {
+	height: auto;
+	margin: 0;
+	padding: 0;
 	display: block;
-}
-
-
-/* CLASSES */
-.parent {
-	display: flex;
-	flex-flow: row wrap;
-	justify-content: space-between;
-	align-items: flex-start;
-}
-.child {
-	/* this is only here to stop the errors */
-	border: none;
-}
-.disabled {
-	pointer-events: none;
-}
-.exploded {
-	background-color: darkred;
-	color: white;
-	border: darkred;
-	border-width: 1px;
-}
-.flagged {
-	color: red;
 }
 .gameBoardBtn {
 	font-size: 100%;
@@ -78,31 +75,8 @@ input[type=number]::-webkit-outer-spin-button {
 	text-align: center;
 	overflow: hidden;
 	display: inline-block;
-	margin: -1px;
-	padding: -1px;
 	position: static;
 }
-.gameBoardRow {
-	height: 25px;
-	display: block;
-}
-.inputArea {
-	/* border-left: 2px solid black; */
-	display: inline-block;
-}
-.input {
-	display: inline-block;
-	overflow: hidden;
-}
-.number {
-	width: 30px;
-}
-.pressed {
-	background-color: darkgray;
-	width: 25px;
-	height: 25px;
-}
-
 
 /* INFO CONTAINER */
 #infoContainer {
@@ -116,23 +90,51 @@ input[type=number]::-webkit-outer-spin-button {
 }
 .timerDiv {
 	margin: auto;
-	width: 30%;
+	width: 40%;
 	float: left;
 	text-align: left;
 }
 .resetDiv {
 	margin: auto;
 	text-align: center;
-	width: 40%;
+	width: 20%;
+}
+#resetBtn {
+	height: 100%;
+	width: 2rem;
+	border-radius: 0;
 	text-align: center;
 }
 .flagsDiv {
 	margin: auto;
-	width: 30%;
+	width: 40%;
 	float: right;
 	text-align: right;
 }
 
+/* ALERTS STYLING */
+#alertPanel {
+	margin: 5px;
+	padding: 5px;
+}
+
+/* BUTTON STATES */
+.disabled {
+	pointer-events: none;
+}
+.exploded {
+	background-color: darkred;
+	border: 1px solid darkred;
+	color: white;
+}
+.flagged {
+	color: red;
+}
+.pressed {
+	background-color: darkgray;
+	width: 25px;
+	height: 25px;
+}
 
 /* TEXT COLOR */
 .textQ {

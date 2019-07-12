@@ -265,8 +265,6 @@ function removeMineAt(r, c) {
 	if (!isUndefined(board, r+1, c-1) && board[r+1][c-1].mine) { board[r][c].value++; }
 	if (!isUndefined(board, r-1, c+1) && board[r-1][c+1].mine) { board[r][c].value++; }
 	if (!isUndefined(board, r-1, c-1) && board[r-1][c-1].mine) { board[r][c].value++; }
-
-	placeMines(1);	//put a new mine somewhere to replace the one we got rid of
 }
 /*=============================================================================================================*/
 /* Game play */
@@ -277,8 +275,9 @@ function play(ele, event) {
 	// console.log('row: '+clickedRow+', col: '+clickedCol);
 
 	if (turnsTaken == 0) {	//check if this is the first turn
-		if (board[clickedRow][clickedCol].mine) {	//check if we clicked on a mine
+		while (board[clickedRow][clickedCol].mine) {	//check if we clicked on a mine
 			removeMineAt(clickedRow, clickedCol);	//remove the mine we clicked
+			placeMines(1);	//put a new mine somewhere to replace the one we got rid of
 		}
 	}
 
@@ -289,7 +288,7 @@ function play(ele, event) {
 		// console.log('Left click at '+clickedRow+', '+clickedCol);
 		leftClick(clickedRow, clickedCol, clickedCell);
 	}
-	if (event.type == 'contextmenu') {	//Right click
+	else if (event.type == 'contextmenu') {	//Right click
 		// console.log('Right click at '+clickedRow+', '+clickedCol);
 		rightClick(clickedCell);
 	}
@@ -302,8 +301,8 @@ function leftClick(clickedRow, clickedCol, clickedCell) {
 
 	if (clickedCell.innerHTML != sym_flag && clickedCell.innerHTML != sym_ques) {	//If there is not anything already there, we can take action
 		if (board[clickedRow][clickedCol].mine) {	//Check for Lose
-			board[clickedRow][clickedCol].value = sym_expl;	//set value of clicked cell to the sym_expl
-			clickedCell.classList.add('textM');	//add the appropriate class
+			clickedCell.innerHTML = sym_expl;	//set value of clicked cell to the sym_expl
+			clickedCell.classList.add('textM', 'exploded');	//add the appropriate class
 			loseEndGame();
 			return;
 		}
@@ -442,10 +441,10 @@ function loseEndGame() {
 			var curCell = document.getElementById('cell_'+i+'_'+j);
 
 			//Explode the unmarked mines
-			if (board[i][j].mine && curCell.innerHTML != sym_flag) {
+			if (board[i][j].mine && curCell.innerHTML != sym_flag && curCell.innerHTML != sym_expl) {
 				// console.log('Setting cell_'+i+'_'+j+' to '+sym_mine);
 				curCell.innerHTML = sym_mine;
-				curCell.classList.add('exploded');
+				curCell.classList.add('textM', 'exploded');
 			}
 
 			//X out the incorrect flags
@@ -501,7 +500,7 @@ function displayMines() {
 		for (let j=0; j<totalCols; j++) {	//Loop through every column
 			let cur = document.getElementById('cell_'+i+'_'+j);	//Grab the cell
 			if (!cur.classList.contains('pressed') && cur.innerHTML == '' && board[i][j].mine) {
-				cur.innerHTML = board[i][j].value;	//display the value of the board at the current location
+				cur.innerHTML = sym_flag;	//display the flag character
 				cur.classList.add('textF');
 			}
 		}
@@ -545,8 +544,8 @@ function undoPrintBoard() {
 		for (let j=0; j<totalCols; j++) {	//Loop through every column
 			let cur = document.getElementById('cell_'+i+'_'+j);
 
-			if (cur.innerHTML == board[i][j].value && !cur.classList.contains('pressed')) {	//detect if we've used the printBoard function
-				cur.innerHTML = '';	//remove it
+			if (!cur.classList.contains('pressed') && cur.innerHTML != sym_flag && cur.innerHTML != sym_ques) {	//detect if we've used the printBoard function
+				cur.innerHTML = '';	//remove the number
 				cur.classList.remove('exploded');	//remove the exploded class if it is there
 			}
 		}

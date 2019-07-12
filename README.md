@@ -6,10 +6,6 @@ An HTML/JS game of minesweeper
 
 #### To-Do
 - Leaderboard styling
-- Settings panel
-    - Flag, mine, and question character selection
-    - Accuracy of timer
-    - Colors?
 - Code comments
 - Code standardization
 
