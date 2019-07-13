@@ -17,14 +17,12 @@ function startTimer() {
 		running = 1;
 	}
 }
-
 function pauseTimer() {
 	clearInterval(tInterval);
 	savedTime = difference;
 	paused = 1;
 	running = 0;
 }
-
 function resetTimer() {
 	timerDisplay = document.getElementById('timerDiv');
 	clearInterval(tInterval);
@@ -34,7 +32,6 @@ function resetTimer() {
 	running = 0;
 	timerDisplay.innerHTML = '00:00:00';
 }
-
 function getShowTime() {
 	timerDisplay = document.getElementById('timerDiv');
 

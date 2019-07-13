@@ -22,7 +22,7 @@ var board   = [];	//This will hold the game board in its entirety
 var toCheck = [];	//Will hold the list of cells to check when expanding empty space
 var totalRows = 0;	//Total number of rows
 var totalCols = 0;	//Total number of columns
-var totalMins = 0;	//Total number of mines
+var totalMines = 0;	//Total number of mines
 var boardSize = 'sm';	//The size of the board
 var priorRstBtnVal = face_default;	//Will hold the value of the reset button
 var turnsTaken = 0;	//Will hold the total number of turns taken
@@ -40,82 +40,29 @@ const boardMap = new Map([
 const leaderboardEntries = 20;		//How many high scores to keep on each leaderboard
 var curBoard = [];	//The leaderboard for the currently selected size
 /*=============================================================================================================*/
-
-document.oncontextmenu = function () {
-	return false;	//This disables the right click context menu
-};
-
-/*=============================================================================================================*/
 /* Before the game starts */
 function pageLoad() {
+	closeSettings();	//Close the settings modal if it is open
+	setTotals();	//Set the total variables
 	start();	//Load up the game
-
-	var userName;	//declare userName
-	var nameField = document.getElementById('userName');	//Grab the div
-	if (!localStorage.getItem('userName')) {	//if the userName doesn't already exist
-		userName = prompt('Leaderboard Name', 'AAA');	//prompt for the name to use on the leaderboards
-		localStorage.setItem('userName', userName);
-	}
-	nameField.value = localStorage.getItem('userName');	//put the username into the name field
-
-	generateLeaderBoardData();	//import leaderboard, creating if necessary
-	generateLeaderBoardDisplay();	//display the leaderboard table	
 }
 function start() {
 	setAlerts('');	//Clear any alerts
 	turnsTaken = 0;	//Reset turnsTaken
-
-	if (boardSize == 'cu') {	//custom size board
-		//We need to make the input areas editable
-		document.getElementById('rows').disabled = false;
-		document.getElementById('cols').disabled = false;
-		document.getElementById('mines').disabled = false;
-
-		//Set the totalRows, totalCols, and totalMins variables
-		totalRows = parseInt(document.getElementById('rows').value, 10);
-		totalCols = parseInt(document.getElementById('cols').value, 10);
-		totalMins = parseInt(document.getElementById('mines').value, 10);
-	}
-	else {	//standard size board
-		//We need to make the input areas readOnly
-		document.getElementById('rows').disabled = true;
-		document.getElementById('cols').disabled = true;
-		document.getElementById('mines').disabled = true;
-
-		//Set the totalRows, totalCols, and totalMins variables
-		totalRows = boardMap.get(boardSize).rows;
-		totalCols = boardMap.get(boardSize).cols;
-		totalMins = boardMap.get(boardSize).mines;
-
-		//Set the input boxes so that they match whatever the current selection is
-		document.getElementById('rows').value = totalRows;
-		document.getElementById('cols').value = totalCols;
-		document.getElementById('mines').value = totalMins;
-	}
-	
-	generateGameBoardData();	//generate the game board data
-	
-	if (document.getElementById('settings').checkValidity()) {	//If everything is valid, proceed
-		generateGameBoardDisplay();	//redraw the board
-		resetTimer();	//reset timer to 0
-	}
-	else {	//If things are not valid, display an error
-		setAlerts('The supplied parameters were not valid.');
-		setBtn(face_error);	//Dizzy Face
-	}
+	confirmSettings();
 }
 function generateGameBoardData() {
 	board = [];	//Clear the board
 
-	for (var i = 0; i < totalRows; i++) {
+	for (var i=0; i<totalRows; i++) {
 		var row = [];
-		for (var j = 0; j < totalCols; j++) {
+		for (var j=0; j<totalCols; j++) {
 			var cell = { value: 0, mine: false, checked: false };
 			row.push(cell);
 		}
 		board.push(row);
 	}
-	placeMines(totalMins);	//place totalMins mines
+	placeMines(totalMines);	//place totalMines mines
 	// console.log(board);
 }
 function generateGameBoardDisplay() {
@@ -140,10 +87,10 @@ function generateGameBoardDisplay() {
 	resetBtn.type = 'Button';
 	resetBtn.id = 'resetBtn';
 	resetBtn.value = face_default;
-	resetBtn.setAttribute('onclick', 'rstBtn(this, event)');
-	resetBtn.setAttribute('onmousedown', 'rstBtn(this, event)');
-	resetBtn.setAttribute('onmouseleave', 'rstBtn(this, event)');
-	resetBtn.setAttribute('onmouseover', 'rstBtn(this, event)');
+	resetBtn.setAttribute('onclick', 'faceBtnHandler(this, event)');
+	resetBtn.setAttribute('onmousedown', 'faceBtnHandler(this, event)');
+	resetBtn.setAttribute('onmouseleave', 'faceBtnHandler(this, event)');
+	resetBtn.setAttribute('onmouseover', 'faceBtnHandler(this, event)');
 	resetDiv.appendChild(resetBtn);		//append resetBtn to resetDiv
 
 	infoDiv.appendChild(resetDiv);	//append resetDiv to infoDiv
@@ -151,7 +98,7 @@ function generateGameBoardDisplay() {
 	let flagsDiv = document.createElement('div');	//div for flags remaining
 	flagsDiv.id = 'flagsDiv';
 	flagsDiv.className = 'flagsDiv';
-	flagsDiv.innerHTML = totalMins;
+	flagsDiv.innerHTML = totalMines;
 	infoDiv.appendChild(flagsDiv);	//append flagsDiv to infoDiv
 
 	boardDiv.appendChild(infoDiv);	//append infoDiv to boardDiv
@@ -173,24 +120,16 @@ function generateGameBoardDisplay() {
 	}
 }
 function generateLeaderBoardData() {
-	if (localStorage.getItem('lead_'+boardSize)) {	//if the current boardSize already has a leaderboard
-		curBoard = JSON.parse(localStorage.getItem('lead_'+boardSize));	//Import it from localStorage
-	}
-	else {	//if the current boardSize does not already have a leaderboard
-		for (let i=0; i<leaderboardEntries; i++) {	//generate leaderboardEntries number of entries
-			curBoard.push({name: 'AAA', time: '99:59:99', savedTime: 9999999});	//push entries into curBoard
-		}
-		localStorage.setItem('lead_'+boardSize, JSON.stringify(curBoard));	//Save our new leaderboard to localStorage
-	}
+	curBoard = localStorage.getItem('lead_'+boardSize) ? JSON.parse(localStorage.getItem('lead_'+boardSize)) : [];
 }
 function generateLeaderBoardDisplay() {
-	boardSize = document.querySelector('input[name=\'size\']:checked').value;	//pull the value out of the selected radio button
+	// boardSize = document.getElementById('sizeSelector').value;	//pull the value out of the selected radio button
 	let leadersDiv = document.getElementById('leaders');
 	leadersDiv.innerHTML = '';	//Clear leaderboard
 
 	if (boardSize == 'cu') {	//Check for custom board size
 		curBoard = [];	//Clear the current leaderboard
-		leadersDiv.innerHTML = 'Custom sized boards don\'t have leaderboards!';
+		setAlerts('Custom sized boards don\'t have leaderboards!');
 		return;	//Don't do the rest, it will break
 	}
 	
@@ -198,8 +137,25 @@ function generateLeaderBoardDisplay() {
 	let lbTbody = document.createElement('tbody');
 
 	//Create header column
-	for (let i=0; i<leaderboardEntries; i++) {
+	let lbHeaderRow = document.createElement('tr');	//Create table header
+
+	let lbHeaderName = document.createElement('th');	//Create cell
+	let lbHeaderNameVal = document.createTextNode('Name');
+	lbHeaderName.appendChild(lbHeaderNameVal);
+	lbHeaderRow.appendChild(lbHeaderName);	//Append header to the row
+
+	let lbHeaderTime = document.createElement('th');	//Create table header
+	let lbHeaderTimeVal = document.createTextNode('Time');
+	lbHeaderTime.appendChild(lbHeaderTimeVal);
+	lbHeaderRow.appendChild(lbHeaderTime);	//Append header to the row
+
+	lbTbody.appendChild(lbHeaderRow);	//Append the row to the table body
+
+	for (let i=0; i<curBoard.length; i++) {
 		let lbRow = document.createElement('tr');	//Create row
+		if (i<3) {
+			lbRow.classList.add('text'+(i+1));
+		}
 
 		let lbDataName = document.createElement('td');	//Create cell
 		let ldDataNameVal = document.createTextNode(curBoard[i].name);
@@ -215,6 +171,12 @@ function generateLeaderBoardDisplay() {
 	}
 	lbTable.appendChild(lbTbody);	//Append the table body to the table
 	leadersDiv.appendChild(lbTable);	//Append the table to the page
+}
+function setTotals() {
+	boardSize = document.getElementById('sizeSelector').value;	//pull the boardSize out of the size selector
+	totalRows = parseInt(document.getElementById('rows').value, 10);	//pull totalRows out of the settings field
+	totalCols = parseInt(document.getElementById('cols').value, 10);	//pull totalCols out of the settings field
+	totalMines = parseInt(document.getElementById('mines').value, 10);	//pull totalMines out of the settings field
 }
 function placeMines(minesToPlace) {
 	let r = 0;
@@ -232,20 +194,19 @@ function placeMineAt(r, c) {
 	board[r][c].mine = true;
 
 	//increment the cells around the mine
-	if (!isUndefined(board, r+1, c  )) { board[r+1][c  ].value++; }		// && !board[r+1][c  ].mine
-	if (!isUndefined(board, r-1, c  )) { board[r-1][c  ].value++; }		// && !board[r-1][c  ].mine
-	if (!isUndefined(board, r  , c+1)) { board[r  ][c+1].value++; }		// && !board[r  ][c+1].mine
-	if (!isUndefined(board, r  , c-1)) { board[r  ][c-1].value++; }		// && !board[r  ][c-1].mine
-	if (!isUndefined(board, r+1, c+1)) { board[r+1][c+1].value++; }		// && !board[r+1][c+1].mine
-	if (!isUndefined(board, r+1, c-1)) { board[r+1][c-1].value++; }		// && !board[r+1][c-1].mine
-	if (!isUndefined(board, r-1, c+1)) { board[r-1][c+1].value++; }		// && !board[r-1][c+1].mine
-	if (!isUndefined(board, r-1, c-1)) { board[r-1][c-1].value++; }		// && !board[r-1][c-1].mine
+	if (!isUndefined(board, r+1, c  )) { board[r+1][c  ].value++; }
+	if (!isUndefined(board, r-1, c  )) { board[r-1][c  ].value++; }
+	if (!isUndefined(board, r  , c+1)) { board[r  ][c+1].value++; }
+	if (!isUndefined(board, r  , c-1)) { board[r  ][c-1].value++; }
+	if (!isUndefined(board, r+1, c+1)) { board[r+1][c+1].value++; }
+	if (!isUndefined(board, r+1, c-1)) { board[r+1][c-1].value++; }
+	if (!isUndefined(board, r-1, c+1)) { board[r-1][c+1].value++; }
+	if (!isUndefined(board, r-1, c-1)) { board[r-1][c-1].value++; }
 }
 function removeMineAt(r, c) {
 	// console.log('Removing mine at '+r+ ', ' +c);
 	board[r][c].mine = false;	//set it to not a mine
 
-	board[r][c].value = 0;	//reset value to 0
 	//decrement the cells around the mine
 	if (!isUndefined(board, r+1, c  )) { board[r+1][c  ].value--; }
 	if (!isUndefined(board, r-1, c  )) { board[r-1][c  ].value--; }
@@ -255,16 +216,6 @@ function removeMineAt(r, c) {
 	if (!isUndefined(board, r+1, c-1)) { board[r+1][c-1].value--; }
 	if (!isUndefined(board, r-1, c+1)) { board[r-1][c+1].value--; }
 	if (!isUndefined(board, r-1, c-1)) { board[r-1][c-1].value--; }
-
-	//calculate the new value
-	if (!isUndefined(board, r+1, c  ) && board[r+1][c  ].mine) { board[r][c].value++; }
-	if (!isUndefined(board, r-1, c  ) && board[r-1][c  ].mine) { board[r][c].value++; }
-	if (!isUndefined(board, r  , c+1) && board[r  ][c+1].mine) { board[r][c].value++; }
-	if (!isUndefined(board, r  , c-1) && board[r  ][c-1].mine) { board[r][c].value++; }
-	if (!isUndefined(board, r+1, c+1) && board[r+1][c+1].mine) { board[r][c].value++; }
-	if (!isUndefined(board, r+1, c-1) && board[r+1][c-1].mine) { board[r][c].value++; }
-	if (!isUndefined(board, r-1, c+1) && board[r-1][c+1].mine) { board[r][c].value++; }
-	if (!isUndefined(board, r-1, c-1) && board[r-1][c-1].mine) { board[r][c].value++; }
 }
 /*=============================================================================================================*/
 /* Game play */
@@ -281,7 +232,7 @@ function play(ele, event) {
 		}
 	}
 
-	undoPrintBoard();	//Run this function, just in case printBoard() has been ran
+	printBoardUndo();	//Run this function, just in case printBoard() has been ran
 	startTimer(); //Start the timer, if it isnt already
 
 	if (event.type == 'click') {	//Left click
@@ -297,25 +248,23 @@ function play(ele, event) {
 	checkWin();	//Check for win
 }
 function leftClick(clickedRow, clickedCol, clickedCell) {
-	setBtn(face_default);	//Neutral Face
+	setFace(face_default);	//Neutral Face
 
 	if (clickedCell.innerHTML != sym_flag && clickedCell.innerHTML != sym_ques) {	//If there is not anything already there, we can take action
-		if (board[clickedRow][clickedCol].mine) {	//Check for Lose
+		if (board[clickedRow][clickedCol].mine) {	//Handle clicking on a mine
 			clickedCell.innerHTML = sym_expl;	//set value of clicked cell to the sym_expl
 			clickedCell.classList.add('textM', 'exploded');	//add the appropriate class
 			loseEndGame();
 			return;
 		}
-		else if (board[clickedRow][clickedCol].value == 0) {	//Check if blank
-			toCheck.push({ row: clickedRow, col: clickedCol });
-			board[clickedRow][clickedCol].checked = true;	//Set the cell to checked
-			expandEmptySpace();	//Expand until we hit the edge or numbers
-		}
-		else if (board[clickedRow][clickedCol].value > 0) {	//Check if number
-			clickedCell.classList.add('pressed');
-			clickedCell.classList.add('text'+board[clickedRow][clickedCol].value);
+		else {	//Handle clicking a number
+			clickedCell.classList.add('pressed', 'text'+board[clickedRow][clickedCol].value);
 			clickedCell.innerHTML = board[clickedRow][clickedCol].value;
 			board[clickedRow][clickedCol].checked = true;
+			if (board[clickedRow][clickedCol].value == 0) {
+				toCheck.push({ row: clickedRow, col: clickedCol });
+				expandEmptySpace();	//Expand until we hit the edge or numbers
+			}
 		}
 	}
 }
@@ -326,19 +275,19 @@ function rightClick(clickedCell) {
 			clickedCell.innerHTML = sym_flag;	//set cell to display the flag character
 			clickedCell.classList.add('textF');	//add the appropriate class
 			clickedCell.classList.remove('textQ');	//remove irrelevant classes
-			setBtn(face_flag);	//display the Anxious Face with Sweat emoji on the reset button
+			setFace(face_flag);	//display the Anxious Face with Sweat emoji on the reset button
 		}
 		else if (clickedCell.innerHTML == sym_flag) {	//Cell is a flag
 			clickedCell.innerHTML = sym_ques;	//set cell to display the question character
 			clickedCell.classList.add('textQ');	//add the appropriate class
 			clickedCell.classList.remove('textF');	//remove irrelevant classes
-			setBtn(face_ques);	//display the Thinking Face emoji on the reset button
+			setFace(face_ques);	//display the Thinking Face emoji on the reset button
 		}
 		else if (clickedCell.innerHTML == sym_ques) {	//Cell is a question
 			clickedCell.innerHTML = '';	//set cell back to empty
 			clickedCell.classList.add();	//add the appropriate class
 			clickedCell.classList.remove('textF', 'textQ');	//remove irrelevant classes
-			setBtn(face_default);	//display the Neutral Face emoji on the reset button
+			setFace(face_default);	//display the Neutral Face emoji on the reset button
 		}
 	}
 }
@@ -348,17 +297,10 @@ function expandEmptySpace() {
 		let c = toCheck[0].col;
 
 		toCheck.shift();	//Dequeue the first element
-		// board[r][c].checked = true;	//Set the cell to checked
-		document.getElementById('cell_' + r + '_' + c).classList.add('pressed');	//press the button by adding the class
 
-		if (board[r][c].value > 0) {	//Display the value
-			document.getElementById('cell_' + r + '_' + c).innerHTML = board[r][c].value;
-			document.getElementById('cell_' + r + '_' + c).classList.add('text'+board[r][c].value);
-		}
-		else if (board[r][c].value == 0) {	//Continue expanding
-			document.getElementById('cell_' + r + '_' + c).innerHTML = '';	//Reset the value, just in case a flag exists
-
-			//We want to check all of the neighbors as well
+		document.getElementById('cell_'+r+'_'+c).classList.add('pressed', 'text'+board[r][c].value);	//add the appropriate classes
+		document.getElementById('cell_'+r+'_'+c).innerHTML = board[r][c].value;	//Display the value
+		if (board[r][c].value == 0) {	//Continue expanding
 			if (!isUndefined(board, r  , c+1) && !board[r  ][c+1].checked) { toCheck.push({ row: r  , col: c+1 }); board[r  ][c+1].checked = true; }	//N
 			if (!isUndefined(board, r+1, c+1) && !board[r+1][c+1].checked) { toCheck.push({ row: r+1, col: c+1 }); board[r+1][c+1].checked = true; }	//NE
 			if (!isUndefined(board, r+1, c  ) && !board[r+1][c  ].checked) { toCheck.push({ row: r+1, col: c   }); board[r+1][c  ].checked = true; }	//E
@@ -368,7 +310,6 @@ function expandEmptySpace() {
 			if (!isUndefined(board, r  , c-1) && !board[r  ][c-1].checked) { toCheck.push({ row: r  , col: c-1 }); board[r  ][c-1].checked = true; }	//W
 			if (!isUndefined(board, r-1, c+1) && !board[r-1][c+1].checked) { toCheck.push({ row: r-1, col: c+1 }); board[r-1][c+1].checked = true; }	//NW
 		}
-		// console.log('Elements left to check: ' +toCheck.length);
 	}
 }
 function updateFlagCount() {
@@ -382,7 +323,7 @@ function updateFlagCount() {
 		}
 	}
 
-	document.getElementById('flagsDiv').innerHTML = totalMins-foundFlags;
+	document.getElementById('flagsDiv').innerHTML = totalMines-foundFlags;
 }
 /*=============================================================================================================*/
 /* End conditions */
@@ -399,7 +340,7 @@ function checkWin() {
 	}
 	// console.log(unpressedCells+ ' unpressed cells remaining');
 
-	if (unpressedCells == totalMins && document.querySelector('.exploded') == null) {
+	if (unpressedCells == totalMines && document.querySelector('.exploded') == null) {
 		pauseTimer();
 
 		displayMines();
@@ -407,7 +348,7 @@ function checkWin() {
 		disableBoard();
 
 		setAlerts('You won!');	//Set alertPanel
-		setBtn(eval('face_'+boardSize+'Win'));	//Set btn to appropriate face
+		setFace(eval('face_'+boardSize+'Win'));	//Set btn to appropriate face
 
 		checkSaveTime();	//Attempt to add to leaderboard
 	}
@@ -424,19 +365,37 @@ function checkSaveTime() {
 		}
 	}
 
-	if (place < curBoard.length) {	//We need to add it to the leaderboard
-		let userName = document.getElementById('userName').value;
+	if (place < leaderboardEntries) {	//We need to add it to the leaderboard
+		let userName;
+		if (localStorage.getItem('userName')) {	//If userName exists in localStorage
+			userName = localStorage.getItem('userName');	//Set userName
+			document.getElementById('userName').value = userName;	//Set userName input field 
+		}
+		else if (document.getElementById('userName').value != '') {	//If there is data in the input field
+			console.log(document.getElementById('userName').value);
+			userName = document.getElementById('userName').value;	//Set userName
+			console.log(document.getElementById('userName').value);
+			localStorage.setItem('userName', userName);	//Set userName in localStorage 
+		}
+		else {
+			userName = prompt('Leaderboard Name', 'AAAAA');	//Collect the username from the user
+			document.getElementById('userName').value = userName;	//Set userName input field
+			localStorage.setItem('userName', userName==null?'AAAAA':userName.slice(0,5));	//Save it to localStorage, enforce 5 char limit
+		}
+
 		let finalTime = document.getElementById('timerDiv').innerHTML;
 		curBoard.splice(place, 0, {name: userName, time: finalTime, savedTime: savedTime});	//Add entry in the correct slot
-		curBoard.pop();	//Remove the last place from the leaderboard
+		if (curBoard.length > leaderboardEntries) {	//Check if we have filled the leaderboard yet
+			curBoard.pop();	//Remove the last place from the leaderboard
+		}
 		localStorage.setItem('lead_'+boardSize, JSON.stringify(curBoard));	//save leaderboard array to local storage
 		generateLeaderBoardDisplay();	//Update leaderboard on screen
-		setAlerts('Congrats! You placed in the top '+leaderboardEntries+' with a time of '+finalTime+'!');
+		setAlerts('Congrats! You got a high score of '+finalTime+'!');
 	}
 }
 function loseEndGame() {
 	pauseTimer();
-	for (var i = 0; i < totalRows; i++) {
+	for (var i=0; i<totalRows; i++) {
 		for (var j = 0; j < totalCols; j++) {
 			var curCell = document.getElementById('cell_'+i+'_'+j);
 
@@ -455,42 +414,8 @@ function loseEndGame() {
 		}
 	}
 	disableBoard();
-	setBtn(face_lost);	//Exploding Head
+	setFace(face_lost);	//Exploding Head
 	setAlerts('You lost.');
-}
-/*=============================================================================================================*/
-/* Utility functions */
-function rstBtn(ele, event) {
-	//Handle events on the reset button
-	let type = event.type;	//the type of event it was
-	let btn = document.getElementById('resetBtn');	//grab the resetBtn
-
-	if (ele != btn) {	//Make sure that this happened on the resetBtn
-		return;	//Leave, disregarding whatever happened
-	}
-	if (type == 'click') {
-		priorRstBtnVal = face_default;	//set to default face
-		start();	//proceed to start function
-	}
-	else if (type == 'mousedown') {
-		priorRstBtnVal = btn.value;	//save the current value of the reset button
-		setBtn(face_down);	//set to held down face
-	}
-	else if (type == 'mouseleave') {
-		setBtn(priorRstBtnVal);	//set to prior face
-	}
-}
-function setAlerts(alertString) {
-	document.getElementById('alertPanel').innerHTML = alertString;	//set the alert panel to display the passed message
-}
-function disableBoard() {
-	for (let i=0; i<totalRows; i++) {
-		for (let j=0; j<totalCols; j++) {
-			let curCell = document.getElementById('cell_'+i+'_'+j);
-			curCell.classList.add('disabled');	//Disable the cell by adding the disabled class
-		}
-	}
-	board = [];	//clear the board variable
 }
 function displayMines() {
 	if (board.length == 0) {	//Check if this is being called before the board has been generated
@@ -506,6 +431,42 @@ function displayMines() {
 		}
 	}
 }
+function disableBoard() {
+	for (let i=0; i<totalRows; i++) {
+		for (let j=0; j<totalCols; j++) {
+			let curCell = document.getElementById('cell_'+i+'_'+j);
+			curCell.classList.add('disabled');	//Disable the cell by adding the disabled class
+		}
+	}
+	board = [];	//clear the board variable
+}
+/*=============================================================================================================*/
+/* Utility functions */
+function openSettings() {
+	document.getElementById('userName').value = localStorage.getItem('userName') ? localStorage.getItem('userName') : '';	//Fill in the userName if possible
+	enableDisableInput();	//enable or disable the input fields correctly
+	document.getElementById('settingsModal').style.display = 'block';	//Set the modal to be visible
+}
+function confirmSettings() {
+	setAlerts('');	//Clear alerts
+	if (document.getElementById('settingsForm').checkValidity()) {	//If everything is valid, proceed
+		setTotals();	//Set totalRows, totalCols, totalMines, and boardSize
+		// changeName();	//Set the new name in localStorage if necessary
+		generateGameBoardData();	//generate the game board data
+		generateGameBoardDisplay();	//redraw the board
+		generateLeaderBoardData();	//import leaderboard, creating if necessary
+		generateLeaderBoardDisplay();	//display the leaderboard table	
+		resetTimer();	//reset timer to 0
+		closeSettings();
+	}
+	else {	//If things are not valid, display an error
+		setAlerts('The supplied parameters were not valid.');
+		setFace(face_error);	//Dizzy Face
+	}
+}
+function closeSettings() {
+	document.getElementById('settingsModal').style.display = 'none';	//Set the modal to be not visible
+}
 function isUndefined(_arr, _index1, _index2) {
 	//This function identifies whether the passed cell is valid
 	try {
@@ -514,17 +475,51 @@ function isUndefined(_arr, _index1, _index2) {
 		return true;
 	}
 }
-function setBtn(emojiCode) {
+function faceBtnHandler(ele, event) {
+	//Handle events on the reset button
+	let type = event.type;	//the type of event it was
+	let btn = document.getElementById('resetBtn');	//grab the resetBtn
+
+	if (ele != btn) {	//Make sure that this happened on the resetBtn
+		return;	//Leave, disregarding whatever happened
+	}
+	if (type == 'click') {
+		priorRstBtnVal = face_default;	//set to default face
+		start();	//proceed to start function
+	}
+	else if (type == 'mousedown') {
+		priorRstBtnVal = btn.value;	//save the current value of the reset button
+		setFace(face_down);	//set to held down face
+	}
+	else if (type == 'mouseleave') {
+		setFace(priorRstBtnVal);	//set to prior face
+	}
+}
+function setAlerts(alertString) {
+	document.getElementById('alertPanel').innerHTML = '<h2>'+alertString+'</h2>';	//set the alert panel to display the passed message
+}
+function setFace(emojiCode) {
 	document.getElementById('resetBtn').value = emojiCode;
 }
-function changeName() {
-	localStorage.setItem('userName', document.getElementById('userName').value);	//Save changes to userName
-}
-function changeSize() {
-	boardSize = document.querySelector('input[name=\'size\']:checked').value;	//pull the value out of the selected radio button
-	generateLeaderBoardData();	//Import{slash}create leaderboard for correct size
-	generateLeaderBoardDisplay();	//Redraw leaderboard
-	start();	//Call Start
+function enableDisableInput() {
+	let tempBoardSize = document.getElementById('sizeSelector').value;
+	if (tempBoardSize == 'cu') {	//custom size board
+		//We need to make the input areas editable
+		document.getElementById('rows').disabled = false;
+		document.getElementById('cols').disabled = false;
+		document.getElementById('mines').disabled = false;
+	}
+	else {	//standard size board
+		//We need to make the input areas readOnly
+		document.getElementById('rows').disabled = true;
+		document.getElementById('cols').disabled = true;
+		document.getElementById('mines').disabled = true;
+
+		//Set the input boxes so that they match whatever the current selection is
+		document.getElementById('rows').value = boardMap.get(tempBoardSize).rows;
+		document.getElementById('cols').value = boardMap.get(tempBoardSize).cols;
+		document.getElementById('mines').value = boardMap.get(tempBoardSize).mines;
+	}
 }
 function printBoard() {
 	for (let i=0; i<totalRows; i++) {	//Loop through every row
@@ -539,7 +534,7 @@ function printBoard() {
 		}
 	}		
 }
-function undoPrintBoard() {
+function printBoardUndo() {
 	for (let i=0; i<totalRows; i++) {	//Loop through every row
 		for (let j=0; j<totalCols; j++) {	//Loop through every column
 			let cur = document.getElementById('cell_'+i+'_'+j);
@@ -550,4 +545,15 @@ function undoPrintBoard() {
 			}
 		}
 	}		
+}
+function resetLeaderboards() {
+	let confirmation = confirm('This will reset all leaderboard data. Are you sure?');	//Get confirmation
+	if (confirmation) {	//If confirmed, delete data
+		localStorage.removeItem('lead_sm');
+		localStorage.removeItem('lead_md');
+		localStorage.removeItem('lead_lg');
+		localStorage.removeItem('lead_xl');
+		localStorage.removeItem('lead_cu');
+		pageLoad();	//Reload the page
+	}
 }

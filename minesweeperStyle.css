@@ -1,8 +1,4 @@
 /* DOM STYLING */
-button {
-    margin: -1px;
-	padding: -1px;
-}
 html {
 	font-family: Arial, Helvetica, sans-serif;
 	overflow-x: auto;
@@ -10,17 +6,29 @@ html {
 }
 
 /* SETTINGS STYLING */
-#settings {
+#settingsBtn {
+	align-content: center;
+	position: fixed;
+	bottom: 0;
+	left: 1rem;
+	border: 2px solid darkgray;
+	width: 100px;
+	height: 30px;
+	padding: 0
+}
+#settingsForm {
 	display: block;
+	height: 20%;
+}
+input[type=button] {
+	cursor: pointer;
 }
 input[type=number] {
-	/* Hide input spinners in Firefox */
-	-moz-appearance: textfield;
+	-moz-appearance: textfield;	/* Hide input spinners in Firefox */
 }
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button {
-	/* Hide input spinners in other browsers */
-	-webkit-appearance: none;
+	-webkit-appearance: none;	/* Hide input spinners in other browsers */
 	margin: 0;
 }
 .inputArea {
@@ -34,14 +42,76 @@ input[type=number]::-webkit-outer-spin-button {
 	width: 30px;
 }
 
+/* SETTINGS MODAL */
+.modalDiv {
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	padding-top: 100px; /* Location of the box */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgb(0,0,0); /* Fallback color */
+	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+.modalContent {
+	position: relative;
+	background-color: #fefefe;
+	margin: auto;
+	padding: 0;
+	border: 1px solid darkgray;
+	width: 50%;
+	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+	-webkit-animation-name: slideIn;
+	-webkit-animation-duration: 0.4s;
+	animation-name: slideIn;
+	animation-duration: 0.4s
+}
+.close {
+	color: white;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+}
+.close:hover,
+.close:focus {
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
+}
+.modalHeader {
+	padding: 2px 16px;
+	background-color: darkgray;
+	color: white;
+}
+.modalBody {
+	padding: 2px 16px;
+}
+.modalFooter {
+	padding: 2px 16px;
+	background-color: darkgray;
+	color: white;
+	text-align: right;
+}
+@-webkit-keyframes slideIn {
+	from {bottom: -300px; left: -300px; opacity: 0} 
+	to {bottom: 0; left: 0; opacity: 1}
+}
+@keyframes slideIn {
+	from {bottom: -300px; left: -300px; opacity: 0}
+	to {bottom: 0; left: 0; opacity: 1}
+}
+
 /* MAIN AREA STYLING */
 #boardColumn {
 	display: inline-block;
 	vertical-align: top;
-	min-width: 50%;
 	padding: 1rem;
 }
 #leaders {
+	padding: 1rem;
 	display: inline-block;
 }
 
@@ -102,6 +172,7 @@ input[type=number]::-webkit-outer-spin-button {
 #resetBtn {
 	height: 100%;
 	width: 2rem;
+	padding: 0;
 	border-radius: 0;
 	text-align: center;
 }
@@ -114,8 +185,38 @@ input[type=number]::-webkit-outer-spin-button {
 
 /* ALERTS STYLING */
 #alertPanel {
-	margin: 5px;
-	padding: 5px;
+	display: block;
+	position: fixed;
+	bottom: 0;
+	background: white;
+	color: darkred;
+	white-space: normal;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+/* LEADERBOARD STYLING */
+table {
+	border: 2px solid black;
+	border-collapse: collapse;
+	width: auto;
+}
+tr:nth-child(1) {
+	border: 2px solid black;
+}
+tr:nth-child(odd) {
+	background-color: lightgray;
+}
+tr:nth-child(2n+6) {	/* Every other row, starting at number 6 */
+	color: turquoise;
+}
+th {
+	background-color: darkgray;
+	color: darkred;
+	padding: 0 5px;
+}
+td {
+	padding: 0 1rem;
 }
 
 /* BUTTON STATES */
@@ -148,6 +249,9 @@ input[type=number]::-webkit-outer-spin-button {
 .textM {
 	/* mine */
 	color: black;
+}
+.text0 {
+	color: rgba(0,0,0,0);
 }
 .text1 {
 	color: blue;

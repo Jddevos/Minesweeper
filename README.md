@@ -5,7 +5,7 @@ An HTML/JS game of minesweeper
 
 
 #### To-Do
-- Leaderboard styling
+- Code optimization
 - Code comments
 - Code standardization
 
@@ -20,3 +20,9 @@ An HTML/JS game of minesweeper
 - Custom size options
 - Things are wonky when flagChar is set to an emoji (&#128681)
 - Local high scores
+- Leaderboard styling
+
+
+
+#### In Progress
+- Prior button not qorking as expected
