@@ -25,4 +25,4 @@ An HTML/JS game of minesweeper
 
 
 #### In Progress
-- Prior button not qorking as expected
+- Pause timer/hide board when settings is open

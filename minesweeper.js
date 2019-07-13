@@ -103,7 +103,10 @@ function generateGameBoardDisplay() {
 
 	boardDiv.appendChild(infoDiv);	//append infoDiv to boardDiv
 
-	//Generate cells
+	//Generate play area
+	let gameDiv = document.createElement('div');	//div to contain the play area
+	gameDiv.id = 'gameDiv';
+
 	let rowContent = '';	//String to build the individual rows
 	for (let i=0; i<totalRows; i++) {
 		let rowDiv = document.createElement('div');
@@ -116,8 +119,10 @@ function generateGameBoardDisplay() {
 		}
 
 		rowDiv.innerHTML = rowContent;	//set the innerHTML all at once
-		boardDiv.appendChild(rowDiv);
+		gameDiv.appendChild(rowDiv);	//append rowDiv to gameDiv
 	}
+
+	boardDiv.appendChild(gameDiv);	//append gameDiv to boardDiv
 }
 function generateLeaderBoardData() {
 	curBoard = localStorage.getItem('lead_'+boardSize) ? JSON.parse(localStorage.getItem('lead_'+boardSize)) : [];
@@ -132,45 +137,48 @@ function generateLeaderBoardDisplay() {
 		setAlerts('Custom sized boards don\'t have leaderboards!');
 		return;	//Don't do the rest, it will break
 	}
-	
-	let lbTable = document.createElement('table');
-	let lbTbody = document.createElement('tbody');
+	else {	//Standard board size
+		if (localStorage.getItem('lead_'+boardSize)){	//Only draw the leaderboard if high scores exist
+			let lbTable = document.createElement('table');
+			let lbTbody = document.createElement('tbody');
 
-	//Create header column
-	let lbHeaderRow = document.createElement('tr');	//Create table header
+			//Create header column
+			let lbHeaderRow = document.createElement('tr');	//Create table header
 
-	let lbHeaderName = document.createElement('th');	//Create cell
-	let lbHeaderNameVal = document.createTextNode('Name');
-	lbHeaderName.appendChild(lbHeaderNameVal);
-	lbHeaderRow.appendChild(lbHeaderName);	//Append header to the row
+			let lbHeaderName = document.createElement('th');	//Create cell
+			let lbHeaderNameVal = document.createTextNode('Name');
+			lbHeaderName.appendChild(lbHeaderNameVal);
+			lbHeaderRow.appendChild(lbHeaderName);	//Append header to the row
 
-	let lbHeaderTime = document.createElement('th');	//Create table header
-	let lbHeaderTimeVal = document.createTextNode('Time');
-	lbHeaderTime.appendChild(lbHeaderTimeVal);
-	lbHeaderRow.appendChild(lbHeaderTime);	//Append header to the row
+			let lbHeaderTime = document.createElement('th');	//Create table header
+			let lbHeaderTimeVal = document.createTextNode('Time');
+			lbHeaderTime.appendChild(lbHeaderTimeVal);
+			lbHeaderRow.appendChild(lbHeaderTime);	//Append header to the row
 
-	lbTbody.appendChild(lbHeaderRow);	//Append the row to the table body
+			lbTbody.appendChild(lbHeaderRow);	//Append the row to the table body
 
-	for (let i=0; i<curBoard.length; i++) {
-		let lbRow = document.createElement('tr');	//Create row
-		if (i<3) {
-			lbRow.classList.add('text'+(i+1));
+			for (let i=0; i<curBoard.length; i++) {
+				let lbRow = document.createElement('tr');	//Create row
+				if (i<3) {
+					lbRow.classList.add('text'+(i+1));
+				}
+
+				let lbDataName = document.createElement('td');	//Create cell
+				let ldDataNameVal = document.createTextNode(curBoard[i].name);
+				lbDataName.appendChild(ldDataNameVal);
+				lbRow.appendChild(lbDataName);	//Append data to the row
+
+				let lbDataTime = document.createElement('td');	//Create cell
+				let ldDataTimeVal = document.createTextNode(curBoard[i].time);
+				lbDataTime.appendChild(ldDataTimeVal);
+				lbRow.appendChild(lbDataTime);	//Append data to the row
+
+				lbTbody.appendChild(lbRow);	//Append the row to the table body
+			}
+			lbTable.appendChild(lbTbody);	//Append the table body to the table
+			leadersDiv.appendChild(lbTable);	//Append the table to the page
 		}
-
-		let lbDataName = document.createElement('td');	//Create cell
-		let ldDataNameVal = document.createTextNode(curBoard[i].name);
-		lbDataName.appendChild(ldDataNameVal);
-		lbRow.appendChild(lbDataName);	//Append data to the row
-
-		let lbDataTime = document.createElement('td');	//Create cell
-		let ldDataTimeVal = document.createTextNode(curBoard[i].time);
-		lbDataTime.appendChild(ldDataTimeVal);
-		lbRow.appendChild(lbDataTime);	//Append data to the row
-
-		lbTbody.appendChild(lbRow);	//Append the row to the table body
 	}
-	lbTable.appendChild(lbTbody);	//Append the table body to the table
-	leadersDiv.appendChild(lbTable);	//Append the table to the page
 }
 function setTotals() {
 	boardSize = document.getElementById('sizeSelector').value;	//pull the boardSize out of the size selector
@@ -443,6 +451,10 @@ function disableBoard() {
 /*=============================================================================================================*/
 /* Utility functions */
 function openSettings() {
+	// pauseTimer();	//Pause the time!
+	// if (board != [] && savedTime > 0) {	//Check if board exists and timer has ran
+	// 	document.getElementById('gameDiv').style.display = 'none';	//Hide the gameDiv
+	// }
 	document.getElementById('userName').value = localStorage.getItem('userName') ? localStorage.getItem('userName') : '';	//Fill in the userName if possible
 	enableDisableInput();	//enable or disable the input fields correctly
 	document.getElementById('settingsModal').style.display = 'block';	//Set the modal to be visible
@@ -465,6 +477,12 @@ function confirmSettings() {
 	}
 }
 function closeSettings() {
+	// if (savedTime > 0) {	//If the game has ran at all
+	// 	startTimer();	//Restart the timer!
+	// }
+	// if (document.getElementById('gameDiv') != null) {	//IF the gameDiv exists
+	// 	document.getElementById('gameDiv').style.display = 'inline-block';	//Show the gameDiv
+	// }
 	document.getElementById('settingsModal').style.display = 'none';	//Set the modal to be not visible
 }
 function isUndefined(_arr, _index1, _index2) {
@@ -499,7 +517,8 @@ function setAlerts(alertString) {
 	document.getElementById('alertPanel').innerHTML = '<h2>'+alertString+'</h2>';	//set the alert panel to display the passed message
 }
 function setFace(emojiCode) {
-	document.getElementById('resetBtn').value = emojiCode;
+	priorRstBtnVal = document.getElementById('resetBtn').value;	//Save the btn face
+	document.getElementById('resetBtn').value = emojiCode;	//Set the new btn face
 }
 function enableDisableInput() {
 	let tempBoardSize = document.getElementById('sizeSelector').value;
