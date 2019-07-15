@@ -451,10 +451,13 @@ function disableBoard() {
 /*=============================================================================================================*/
 /* Utility functions */
 function openSettings() {
-	// pauseTimer();	//Pause the time!
-	// if (board != [] && savedTime > 0) {	//Check if board exists and timer has ran
-	// 	document.getElementById('gameDiv').style.display = 'none';	//Hide the gameDiv
-	// }
+	pauseTimer();	//Pause the time!
+	for (let i=0; i<totalRows; i++) {	//Hide board
+		for (let j=0; j<totalCols; j++) {
+			let curCell = document.getElementById('cell_'+i+'_'+j);
+			curCell.classList.add('hidden');	//Hide the cell by adding the hidden class
+		}
+	}
 	document.getElementById('userName').value = localStorage.getItem('userName') ? localStorage.getItem('userName') : '';	//Fill in the userName if possible
 	enableDisableInput();	//enable or disable the input fields correctly
 	document.getElementById('settingsModal').style.display = 'block';	//Set the modal to be visible
@@ -477,12 +480,15 @@ function confirmSettings() {
 	}
 }
 function closeSettings() {
-	// if (savedTime > 0) {	//If the game has ran at all
-	// 	startTimer();	//Restart the timer!
-	// }
-	// if (document.getElementById('gameDiv') != null) {	//IF the gameDiv exists
-	// 	document.getElementById('gameDiv').style.display = 'inline-block';	//Show the gameDiv
-	// }
+	if (savedTime > 0) {	//If the game has ran at all
+		startTimer();	//Restart the timer!
+	}
+	for (let i=0; i<totalRows; i++) {	//Show board
+		for (let j=0; j<totalCols; j++) {
+			let curCell = document.getElementById('cell_'+i+'_'+j);
+			curCell.classList.remove('hidden');	//Unhide the cell by removing the hidden class
+		}
+	}
 	document.getElementById('settingsModal').style.display = 'none';	//Set the modal to be not visible
 }
 function isUndefined(_arr, _index1, _index2) {

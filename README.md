@@ -25,4 +25,4 @@ An HTML/JS game of minesweeper
 
 
 #### In Progress
-- Pause timer/hide board when settings is open
+- confirmSettings, pageLoad, and start can probably be simplified
