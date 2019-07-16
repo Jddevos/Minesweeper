@@ -2,6 +2,10 @@
 An HTML/JS game of minesweeper
 
 
+### Features
+- Local high score board
+- Standard sizes
+- Custom size boards (up to 999x999_99999)
 
 
 #### To-Do
@@ -21,8 +25,3 @@ An HTML/JS game of minesweeper
 - Things are wonky when flagChar is set to an emoji (&#128681)
 - Local high scores
 - Leaderboard styling
-
-
-
-#### In Progress
-- confirmSettings, pageLoad, and start can probably be simplified

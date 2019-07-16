@@ -41,15 +41,11 @@ const leaderboardEntries = 20;		//How many high scores to keep on each leaderboa
 var curBoard = [];	//The leaderboard for the currently selected size
 /*=============================================================================================================*/
 /* Before the game starts */
-function pageLoad() {
-	closeSettings();	//Close the settings modal if it is open
-	setTotals();	//Set the total variables
-	start();	//Load up the game
-}
 function start() {
+	setTotals();	//Set the total variables
 	setAlerts('');	//Clear any alerts
 	turnsTaken = 0;	//Reset turnsTaken
-	confirmSettings();
+	confirmSettings();	//Confirm the settings are correct
 }
 function generateGameBoardData() {
 	board = [];	//Clear the board
@@ -115,7 +111,7 @@ function generateGameBoardDisplay() {
 
 		for (let j=0; j<totalCols; j++) {
 			//Create div for the individual cell
-			rowContent += '<div class=\'gameBoardBtn\' id=\'cell_'+i+'_'+j+'\' row=\''+i+'\' col=\''+j+'\' onclick=\'play(this, event)\' oncontextmenu=\'play(this, event)\'></div>';
+			rowContent += '<div class="gameBoardBtn" id="cell_'+i+'_'+j+'" row="'+i+'" col="'+j+'" onclick="play(this, event)" oncontextmenu="play(this, event)"></div>';
 		}
 
 		rowDiv.innerHTML = rowContent;	//set the innerHTML all at once
@@ -466,16 +462,15 @@ function confirmSettings() {
 	setAlerts('');	//Clear alerts
 	if (document.getElementById('settingsForm').checkValidity()) {	//If everything is valid, proceed
 		setTotals();	//Set totalRows, totalCols, totalMines, and boardSize
-		// changeName();	//Set the new name in localStorage if necessary
 		generateGameBoardData();	//generate the game board data
 		generateGameBoardDisplay();	//redraw the board
 		generateLeaderBoardData();	//import leaderboard, creating if necessary
 		generateLeaderBoardDisplay();	//display the leaderboard table	
 		resetTimer();	//reset timer to 0
-		closeSettings();
+		closeSettings();	//close settings panel
 	}
 	else {	//If things are not valid, display an error
-		setAlerts('The supplied parameters were not valid.');
+		setAlerts('The supplied parameters were not valid.');	//Display an alert
 		setFace(face_error);	//Dizzy Face
 	}
 }
@@ -579,6 +574,6 @@ function resetLeaderboards() {
 		localStorage.removeItem('lead_lg');
 		localStorage.removeItem('lead_xl');
 		localStorage.removeItem('lead_cu');
-		pageLoad();	//Reload the page
+		start();	//Reload the page
 	}
 }

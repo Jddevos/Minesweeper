@@ -6,7 +6,7 @@
 		<link rel="stylesheet" href="minesweeperStyle.css" />
 		<script src="minesweeper.js"></script>
 	</head>
-	<body onload="pageLoad()" oncontextmenu="return false;">
+	<body onload="start()" oncontextmenu="return false;">
 		<div id="settingsModal" class="modalDiv">
 			<div class="modalContent">
 				<div class="modalHeader">
@@ -29,7 +29,7 @@
 							<span>&#124;&#124;</span>
 							Rows:<input type="number" name="rows" id="rows" min="8" max="999" value="9" class="input number">
 							Columns:<input type="number" name="cols" id="cols" min="8" max="999" value="9" class="input number">
-							Mines:<input type="number" name="mines" id="mines" min="8" max="9999" value="10" class="input number">
+							Mines:<input type="number" name="mines" id="mines" min="8" max="99999" value="10" class="input number">
 						</p>
 					</form>
 				</div>
