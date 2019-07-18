@@ -27,8 +27,8 @@
 								<option value="cu">Custom</option>
 							</select>
 							<span>&#124;&#124;</span>
-							Rows:<input type="number" name="rows" id="rows" min="8" max="999" value="9" class="input number">
-							Columns:<input type="number" name="cols" id="cols" min="8" max="999" value="9" class="input number">
+							Rows:<input type="number" name="rows" id="rows" min="8" max="999" value="9" class="input number" onchange="updateMaxMines()">
+							Columns:<input type="number" name="cols" id="cols" min="8" max="999" value="9" class="input number" onchange="updateMaxMines()">
 							Mines:<input type="number" name="mines" id="mines" min="8" max="99999" value="10" class="input number">
 						</p>
 					</form>

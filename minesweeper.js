@@ -535,6 +535,12 @@ function enableDisableInput() {
 		document.getElementById('mines').value = boardMap.get(tempBoardSize).mines;	// Set the input boxes to display the value of the selected board size
 	}
 }
+function updateMaxMines() {
+	let rInput = document.getElementById('rows');	// Grab the rows input element
+	let cInput = document.getElementById('cols');	// Grab the cols input element
+	let mInput = document.getElementById('mines');	// Grab the mines input element
+	mInput.max = rInput.value * cInput.value - 1;	// Set the max number of mines to be one less than the total number of cells
+}
 function printBoard() {
 	for (let i=0; i<totalRows; i++) {	// Loop through every row
 		for (let j=0; j<totalCols; j++) {	// Loop through every column
