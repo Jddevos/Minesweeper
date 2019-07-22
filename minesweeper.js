@@ -44,7 +44,6 @@ var curBoard = [];	// The leaderboard for the currently selected size
 function start() {
 	setTotals();	// Set the total variables
 	setAlerts('');	// Clear any alerts
-	turnsTaken = 0;	// Reset turnsTaken
 	confirmSettings();	// Confirm the settings are correct
 }
 function generateGameBoardData() {
@@ -447,6 +446,7 @@ function openSettings() {
 	document.getElementById('settingsModal').style.display = 'block';	// Set the modal to be visible
 }
 function confirmSettings() {
+	turnsTaken = 0;	// Reset turnsTaken
 	setAlerts('');	// Clear alerts
 	updateMaxMines();	// Update the maximum mines allowed
 	if (document.getElementById('settingsForm').checkValidity()) {	// If everything is valid, proceed
