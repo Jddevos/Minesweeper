@@ -448,6 +448,7 @@ function openSettings() {
 }
 function confirmSettings() {
 	setAlerts('');	// Clear alerts
+	updateMaxMines();	// Update the maximum mines allowed
 	if (document.getElementById('settingsForm').checkValidity()) {	// If everything is valid, proceed
 		setTotals();	// Set totalRows, totalCols, totalMines, and boardSize
 		setUserName();	// Set userName
