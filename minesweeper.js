@@ -37,7 +37,7 @@ const boardMap = new Map([
 ]);
 
 /* Storage */
-const leaderboardEntries = 20;		// How many high scores to keep on each leaderboard
+const leaderboardEntries = 10;		// How many high scores to keep on each leaderboard
 var curBoard = [];	// The leaderboard for the currently selected size
 /*=============================================================================================================*/
 /* Before the game starts */
@@ -121,58 +121,52 @@ function generateGameBoardDisplay() {
 	boardDiv.appendChild(gameDiv);	// Append gameDiv to boardDiv
 }
 function generateLeaderBoardData() {
-	curBoard = localStorage.getItem('lead_'+boardSize) ? JSON.parse(localStorage.getItem('lead_'+boardSize)) : [];	// Pull in leaderboard data if it exists
+	curBoard = localStorage.getItem(totalRows+'x'+totalCols+'_'+totalMines) ? JSON.parse(localStorage.getItem(totalRows+'x'+totalCols+'_'+totalMines)) : [];	// Pull in leaderboard data if it exists
+
 }
 function generateLeaderBoardDisplay() {
 	let leadersDiv = document.getElementById('leaders');
 	leadersDiv.innerHTML = '';	// Clear leaderboard
 
-	if (boardSize == 'cu') {	// Check for custom board size
-		curBoard = [];	// Clear the current leaderboard
-		setAlerts('Custom sized boards don\'t have leaderboards!');
-		return;	// Don't do the rest, it will break
-	}
-	else {	// Standard board size
-		if (localStorage.getItem('lead_'+boardSize)){	// Only draw the leaderboard if high scores exist
-			let lbTable = document.createElement('table');
-			let lbTbody = document.createElement('tbody');
+	if (localStorage.getItem(totalRows+'x'+totalCols+'_'+totalMines)){	// Only draw the leaderboard if high scores exist
+		let lbTable = document.createElement('table');
+		let lbTbody = document.createElement('tbody');
 
-			// Create header column
-			let lbHeaderRow = document.createElement('tr');	// Create table header
+		// Create header column
+		let lbHeaderRow = document.createElement('tr');	// Create table header
 
-			let lbHeaderName = document.createElement('th');	// Create cell
-			let lbHeaderNameVal = document.createTextNode('Name');
-			lbHeaderName.appendChild(lbHeaderNameVal);
-			lbHeaderRow.appendChild(lbHeaderName);	// Append header to the row
+		let lbHeaderName = document.createElement('th');	// Create cell
+		let lbHeaderNameVal = document.createTextNode('Name');
+		lbHeaderName.appendChild(lbHeaderNameVal);
+		lbHeaderRow.appendChild(lbHeaderName);	// Append header to the row
 
-			let lbHeaderTime = document.createElement('th');	// Create table header
-			let lbHeaderTimeVal = document.createTextNode('Time');
-			lbHeaderTime.appendChild(lbHeaderTimeVal);
-			lbHeaderRow.appendChild(lbHeaderTime);	// Append header to the row
+		let lbHeaderTime = document.createElement('th');	// Create table header
+		let lbHeaderTimeVal = document.createTextNode('Time');
+		lbHeaderTime.appendChild(lbHeaderTimeVal);
+		lbHeaderRow.appendChild(lbHeaderTime);	// Append header to the row
 
-			lbTbody.appendChild(lbHeaderRow);	// Append the row to the table body
+		lbTbody.appendChild(lbHeaderRow);	// Append the row to the table body
 
-			for (let i=0; i<curBoard.length; i++) {
-				let lbRow = document.createElement('tr');	// Create row
-				if (i<3) {
-					lbRow.classList.add('text'+(i+1));
-				}
-
-				let lbDataName = document.createElement('td');	// Create cell
-				let ldDataNameVal = document.createTextNode(curBoard[i].name);
-				lbDataName.appendChild(ldDataNameVal);
-				lbRow.appendChild(lbDataName);	// Append data to the row
-
-				let lbDataTime = document.createElement('td');	// Create cell
-				let ldDataTimeVal = document.createTextNode(curBoard[i].time);
-				lbDataTime.appendChild(ldDataTimeVal);
-				lbRow.appendChild(lbDataTime);	// Append data to the row
-
-				lbTbody.appendChild(lbRow);	// Append the row to the table body
+		for (let i=0; i<curBoard.length; i++) {
+			let lbRow = document.createElement('tr');	// Create row
+			if (i<3) {
+				lbRow.classList.add('text'+(i+1));
 			}
-			lbTable.appendChild(lbTbody);	// Append the table body to the table
-			leadersDiv.appendChild(lbTable);	// Append the table to the page
+
+			let lbDataName = document.createElement('td');	// Create cell
+			let ldDataNameVal = document.createTextNode(curBoard[i].name);
+			lbDataName.appendChild(ldDataNameVal);
+			lbRow.appendChild(lbDataName);	// Append data to the row
+
+			let lbDataTime = document.createElement('td');	// Create cell
+			let ldDataTimeVal = document.createTextNode(curBoard[i].time);
+			lbDataTime.appendChild(ldDataTimeVal);
+			lbRow.appendChild(lbDataTime);	// Append data to the row
+
+			lbTbody.appendChild(lbRow);	// Append the row to the table body
 		}
+		lbTable.appendChild(lbTbody);	// Append the table body to the table
+		leadersDiv.appendChild(lbTable);	// Append the table to the page
 	}
 }
 function setTotals() {
@@ -193,32 +187,32 @@ function placeMines(minesToPlace) {
 	}
 }
 function placeMineAt(r, c) {
-	console.log('Placing mine at '+r+', '+c);
+	// console.log('Placing mine at '+r+', '+c);
 	board[r][c].mine = true;	// Place mine
 
 	// Increment the cells around the mine
-	if (!isUndefined(board, r+1, c  )) { board[r+1][c  ].value++; }	//S
-	if (!isUndefined(board, r-1, c  )) { board[r-1][c  ].value++; }	//N
-	if (!isUndefined(board, r  , c+1)) { board[r  ][c+1].value++; }	//E
-	if (!isUndefined(board, r  , c-1)) { board[r  ][c-1].value++; }	//W
-	if (!isUndefined(board, r+1, c+1)) { board[r+1][c+1].value++; }	//SE
-	if (!isUndefined(board, r+1, c-1)) { board[r+1][c-1].value++; }	//SW
-	if (!isUndefined(board, r-1, c+1)) { board[r-1][c+1].value++; }	//NE
-	if (!isUndefined(board, r-1, c-1)) { board[r-1][c-1].value++; }	//NW
+	if (!isUndefined(board, r+1, c  )) { board[r+1][c  ].value++; }	// S
+	if (!isUndefined(board, r-1, c  )) { board[r-1][c  ].value++; }	// N
+	if (!isUndefined(board, r  , c+1)) { board[r  ][c+1].value++; }	// E
+	if (!isUndefined(board, r  , c-1)) { board[r  ][c-1].value++; }	// W
+	if (!isUndefined(board, r+1, c+1)) { board[r+1][c+1].value++; }	// SE
+	if (!isUndefined(board, r+1, c-1)) { board[r+1][c-1].value++; }	// SW
+	if (!isUndefined(board, r-1, c+1)) { board[r-1][c+1].value++; }	// NE
+	if (!isUndefined(board, r-1, c-1)) { board[r-1][c-1].value++; }	// NW
 }
 function removeMineAt(r, c) {
-	console.log('Removing mine at '+r+ ', ' +c);
+	// console.log('Removing mine at '+r+ ', ' +c);
 	board[r][c].mine = false;	// Remove mine
 
 	// Decrement the cells around the mine
-	if (!isUndefined(board, r+1, c  )) { board[r+1][c  ].value--; }	//S
-	if (!isUndefined(board, r-1, c  )) { board[r-1][c  ].value--; }	//N
-	if (!isUndefined(board, r  , c+1)) { board[r  ][c+1].value--; }	//E
-	if (!isUndefined(board, r  , c-1)) { board[r  ][c-1].value--; }	//W
-	if (!isUndefined(board, r+1, c+1)) { board[r+1][c+1].value--; }	//SE
-	if (!isUndefined(board, r+1, c-1)) { board[r+1][c-1].value--; }	//SW
-	if (!isUndefined(board, r-1, c+1)) { board[r-1][c+1].value--; }	//NE
-	if (!isUndefined(board, r-1, c-1)) { board[r-1][c-1].value--; }	//NW
+	if (!isUndefined(board, r+1, c  )) { board[r+1][c  ].value--; }	// S
+	if (!isUndefined(board, r-1, c  )) { board[r-1][c  ].value--; }	// N
+	if (!isUndefined(board, r  , c+1)) { board[r  ][c+1].value--; }	// E
+	if (!isUndefined(board, r  , c-1)) { board[r  ][c-1].value--; }	// W
+	if (!isUndefined(board, r+1, c+1)) { board[r+1][c+1].value--; }	// SE
+	if (!isUndefined(board, r+1, c-1)) { board[r+1][c-1].value--; }	// SW
+	if (!isUndefined(board, r-1, c+1)) { board[r-1][c+1].value--; }	// NE
+	if (!isUndefined(board, r-1, c-1)) { board[r-1][c-1].value--; }	// NW
 }
 /*=============================================================================================================*/
 /* Game play */
@@ -387,7 +381,7 @@ function checkSaveTime() {
 		if (curBoard.length > leaderboardEntries) {	// Check if we have filled the leaderboard yet
 			curBoard.pop();	// Remove the last place from the leaderboard
 		}
-		localStorage.setItem('lead_'+boardSize, JSON.stringify(curBoard));	// Save leaderboard array to local storage
+		localStorage.setItem(totalRows+'x'+totalCols+'_'+totalMines, JSON.stringify(curBoard));	// Save leaderboard array to local storage
 		generateLeaderBoardDisplay();	// Update leaderboard on screen
 		setAlerts('Congrats! You got a high score of '+finalTime+'!');	// Set alert
 	}
@@ -456,6 +450,7 @@ function confirmSettings() {
 	setAlerts('');	// Clear alerts
 	if (document.getElementById('settingsForm').checkValidity()) {	// If everything is valid, proceed
 		setTotals();	// Set totalRows, totalCols, totalMines, and boardSize
+		setUserName();	// Set userName
 		generateGameBoardData();	// Generate the game board data
 		generateGameBoardDisplay();	// Redraw the board
 		generateLeaderBoardData();	// Import leaderboard, creating if necessary
@@ -518,6 +513,12 @@ function setFace(emojiCode) {
 	priorRstBtnVal = document.getElementById('resetBtn').value;	// Save the resetBtn face to priorRstBtnVal
 	document.getElementById('resetBtn').value = emojiCode;	// Set the new resetBtn face
 }
+function setUserName() {
+	let userName = document.getElementById('userName').value;	// Pull value from input field
+	if (userName != localStorage.getItem('userName') && userName != '') {	// Check if the userName was changed and isn't empty
+		localStorage.setItem('userName', userName);	// Set value in localStorage if it exists, otherwise set to AAAAA
+	}
+}
 function enableDisableInput() {
 	let tempBoardSize = document.getElementById('sizeSelector').value;	// Declare a variable to hold the board size within the settings
 	if (tempBoardSize == 'cu') {	// Check for custom size board
@@ -570,11 +571,11 @@ function printBoardUndo() {
 function resetLeaderboards() {
 	let confirmation = confirm('This will reset all leaderboard data. Are you sure?');	// Get confirmation before proceeding
 	if (confirmation) {	// If confirmed, delete data
-		localStorage.removeItem('lead_sm');	// Remove lead_sm from localStorage
-		localStorage.removeItem('lead_md');	// Remove lead_md from localStorage
-		localStorage.removeItem('lead_lg');	// Remove lead_lg from localStorage
-		localStorage.removeItem('lead_xl');	// Remove lead_xl from localStorage
-		localStorage.removeItem('lead_cu');	// Remove lead_cu from localStorage
+		let userNameBackup = localStorage.getItem('userName') ? localStorage.getItem('userName') : '';	// Save the userName to a variable if it exists
+		localStorage.clear();	// Clear localStorage
+		if (userNameBackup.length > 0) {	// Check if we pulled anything from localStorage
+			localStorage.setItem('userName', userNameBackup);	// Restore userName to localStorage
+		}
 		start();	// Proceed to start function
 	}
 }
