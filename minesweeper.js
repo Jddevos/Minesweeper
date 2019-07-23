@@ -124,42 +124,34 @@ function generateLeaderBoardData() {
 
 }
 function generateLeaderBoardDisplay() {
-	let leadersDiv = document.getElementById('leaders');
+	let leadersDiv = document.getElementById('leaders');	// Grab the leadersDiv element
 	leadersDiv.innerHTML = '';	// Clear leaderboard
 
 	if (localStorage.getItem(totalRows+'x'+totalCols+'_'+totalMines)){	// Only draw the leaderboard if high scores exist
-		let lbTable = document.createElement('table');
-		let lbTbody = document.createElement('tbody');
-
-		// Create header column
+		let lbTable = document.createElement('table');	// Define the table
+		let lbTbody = document.createElement('tbody');	// Define the body of the table
 		let lbHeaderRow = document.createElement('tr');	// Create table header
-
-		let lbHeaderName = document.createElement('th');	// Create cell
-		let lbHeaderNameVal = document.createTextNode('Name');
-		lbHeaderName.appendChild(lbHeaderNameVal);
-		lbHeaderRow.appendChild(lbHeaderName);	// Append header to the row
-
-		let lbHeaderTime = document.createElement('th');	// Create table header
-		let lbHeaderTimeVal = document.createTextNode('Time');
-		lbHeaderTime.appendChild(lbHeaderTimeVal);
-		lbHeaderRow.appendChild(lbHeaderTime);	// Append header to the row
-
+		let lbHeader = document.createElement('th');	// Create table header cell
+		lbHeader.setAttribute('colspan', 2);	// Set header to span both columns
+		let lbHeaderVal = document.createTextNode(totalRows+'x'+totalCols+'_'+totalMines);	// Create textNode to display board size in the header cell
+		lbHeader.appendChild(lbHeaderVal);	// Append textNode to Cell
+		lbHeaderRow.appendChild(lbHeader);	// Append header to the row
 		lbTbody.appendChild(lbHeaderRow);	// Append the row to the table body
 
-		for (let i=0; i<curBoard.length; i++) {
+		for (let i=0; i<curBoard.length; i++) {	// Loop through every entry in the leaderboard
 			let lbRow = document.createElement('tr');	// Create row
-			if (i<3) {
-				lbRow.classList.add('text'+(i+1));
+			if (i<3) {	// Check if we are in the first 3 rows
+				lbRow.classList.add('text'+(i+1));	// Add a text class to color the text
 			}
 
 			let lbDataName = document.createElement('td');	// Create cell
 			let ldDataNameVal = document.createTextNode(curBoard[i].name);
-			lbDataName.appendChild(ldDataNameVal);
+			lbDataName.appendChild(ldDataNameVal);	// Append textNode to the cell
 			lbRow.appendChild(lbDataName);	// Append data to the row
 
 			let lbDataTime = document.createElement('td');	// Create cell
 			let ldDataTimeVal = document.createTextNode(curBoard[i].time);
-			lbDataTime.appendChild(ldDataTimeVal);
+			lbDataTime.appendChild(ldDataTimeVal);	// Append textNode to the cell
 			lbRow.appendChild(lbDataTime);	// Append data to the row
 
 			lbTbody.appendChild(lbRow);	// Append the row to the table body
