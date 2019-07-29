@@ -26,6 +26,7 @@ var totalMines = 0;	// Total number of mines
 var boardSize = 'sm';	// The size of the board
 var priorRstBtnVal = face_default;	// Will hold the value of the reset button
 var turnsTaken = 0;	// Will hold the total number of turns taken
+var gameIsActive = false;	// Will hold whether the game is currently active
 
 /* Board sizes */
 const boardMap = new Map([
@@ -222,6 +223,7 @@ function play(ele, event) {
 
 	printBoardUndo();	// Run this function, just in case printBoard() has been ran
 	startTimer(); // Start the timer, if it isnt already
+	gameIsActive = true;	// Set the game to active
 
 	if (event.type == 'click') {	// Left click
 		// console.log('Left click at '+clickedRow+', '+clickedCol);
@@ -334,6 +336,7 @@ function checkWin() {
 		displayMines();	// Show remaining mines
 		updateFlagCount();	// Update the flag count (in case some were unmarked)
 		disableBoard();	// Don't allow any more input
+		gameIsActive = false;	// Mark the game as not active
 		setAlerts('You won!');	// Set alertPanel
 		setFace(eval('face_'+boardSize+'Win'));	// Set btn to appropriate face
 		checkSaveTime();	// Attempt to add to leaderboard
@@ -397,6 +400,7 @@ function loseEndGame() {
 		}
 	}
 	disableBoard();	// Disable the board
+	gameIsActive = false;	// Mark the game as not active
 	setFace(face_lost);	// Set face to face_lost
 	setAlerts('You lost.');	// Inform the player
 }
@@ -426,11 +430,13 @@ function disableBoard() {
 /*=============================================================================================================*/
 /* Utility functions */
 function openSettings() {
-	pauseTimer();	// Pause the timer
-	for (let i=0; i<totalRows; i++) {	// Loop through every row
-		for (let j=0; j<totalCols; j++) {	// Loop through every column
-			let curCell = document.getElementById('cell_'+i+'_'+j);	// Grab the cell
-			curCell.classList.add('hidden');	// Hide the cell by adding the hidden class
+	if (gameIsActive) {	// Check if game is active
+		pauseTimer();	// Pause the timer
+		for (let i=0; i<totalRows; i++) {	// Loop through every row
+			for (let j=0; j<totalCols; j++) {	// Loop through every column
+				let curCell = document.getElementById('cell_'+i+'_'+j);	// Grab the cell
+				curCell.classList.add('hidden');	// Hide the cell by adding the hidden class
+			}
 		}
 	}
 	document.getElementById('userName').value = localStorage.getItem('userName') ? localStorage.getItem('userName') : '';	// Fill in the userName if possible
@@ -457,7 +463,7 @@ function confirmSettings() {
 	}
 }
 function closeSettings() {
-	if (savedTime > 0) {	// If the game has ran at all
+	if (gameIsActive) {	// If the game is active
 		startTimer();	// Restart the timer!
 	}
 	for (let i=0; i<totalRows; i++) {	// Loop through every row
