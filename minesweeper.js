@@ -26,7 +26,8 @@ var totalMines = 0;	// Total number of mines
 var boardSize = 'sm';	// The size of the board
 var priorRstBtnVal = face_default;	// Will hold the value of the reset button
 var turnsTaken = 0;	// Will hold the total number of turns taken
-var gameIsActive = false;	// Will hold whether the game is currently active
+var gameIsActive = false;	// Flag indicating whether the game is currently active
+var hasCheated = false;	// Flag indicating whether the player has cheated
 
 /* Board sizes */
 const boardMap = new Map([
@@ -333,13 +334,13 @@ function checkWin() {
 
 	if (unpressedCells == totalMines && document.querySelector('.exploded') == null) {	// Check if unpressed cells == totalMines, and there aren't any exploded ones
 		pauseTimer();	// Pause Timer
+		gameIsActive = false;	// Mark the game as not active
+		checkSaveTime();	// Attempt to add to leaderboard
 		displayMines();	// Show remaining mines
 		updateFlagCount();	// Update the flag count (in case some were unmarked)
 		disableBoard();	// Don't allow any more input
-		gameIsActive = false;	// Mark the game as not active
 		setAlerts('You won!');	// Set alertPanel
 		setFace(eval('face_'+boardSize+'Win'));	// Set btn to appropriate face
-		checkSaveTime();	// Attempt to add to leaderboard
 	}
 }
 function checkSaveTime() {
@@ -370,6 +371,8 @@ function checkSaveTime() {
 			localStorage.setItem('userName', userName==null?'AAAAA':userName.slice(0,5));	// Save it to localStorage, enforce 5 char limit
 		}
 
+		userName = hasCheated ? userName+'*' : userName;	// If they have cheated, append an * to their name in the leaderboard
+
 		let finalTime = document.getElementById('timerDiv').innerHTML;	// Pull in final time
 		curBoard.splice(place, 0, {name: userName, time: finalTime, savedTime: savedTime});	// Add entry in the correct slot
 		if (curBoard.length > leaderboardEntries) {	// Check if we have filled the leaderboard yet
@@ -382,6 +385,7 @@ function checkSaveTime() {
 }
 function loseEndGame() {
 	pauseTimer();	// Pause the timer
+	gameIsActive = false;	// Mark the game as not active
 	for (var i=0; i<totalRows; i++) {	// Loop through every row
 		for (var j = 0; j < totalCols; j++) {	// Loop through every column
 			var curCell = document.getElementById('cell_'+i+'_'+j);
@@ -400,11 +404,11 @@ function loseEndGame() {
 		}
 	}
 	disableBoard();	// Disable the board
-	gameIsActive = false;	// Mark the game as not active
 	setFace(face_lost);	// Set face to face_lost
 	setAlerts('You lost.');	// Inform the player
 }
 function displayMines() {
+	hasCheated = true;	// Set hasCheated to true if the game is active
 	if (board.length == 0) {	// Check if this is being called before the board has been generated
 		generateGameBoardData(0);	// Create the board real quick to avoid errors
 	}
@@ -445,6 +449,7 @@ function openSettings() {
 }
 function confirmSettings() {
 	turnsTaken = 0;	// Reset turnsTaken
+	hasCheated = false;	// Reset hasCheated variable
 	setAlerts('');	// Clear alerts
 	updateMaxMines();	// Update the maximum mines allowed
 	if (document.getElementById('settingsForm').checkValidity()) {	// If everything is valid, proceed
@@ -542,6 +547,7 @@ function updateMaxMines() {
 	mInput.max = rInput.value * cInput.value - 1;	// Set the max number of mines to be one less than the total number of cells
 }
 function printBoard() {
+	hasCheated = true;	// Set hasCheated to true if the game is active
 	for (let i=0; i<totalRows; i++) {	// Loop through every row
 		for (let j=0; j<totalCols; j++) {	// Loop through every column
 			let cur = document.getElementById('cell_'+i+'_'+j);	// Grab the cell
