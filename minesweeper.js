@@ -335,11 +335,11 @@ function checkWin() {
 	if (unpressedCells == totalMines && document.querySelector('.exploded') == null) {	// Check if unpressed cells == totalMines, and there aren't any exploded ones
 		pauseTimer();	// Pause Timer
 		gameIsActive = false;	// Mark the game as not active
+		setAlerts('You won!');	// Set alertPanel
 		checkSaveTime();	// Attempt to add to leaderboard
 		displayMines();	// Show remaining mines
 		updateFlagCount();	// Update the flag count (in case some were unmarked)
 		disableBoard();	// Don't allow any more input
-		setAlerts('You won!');	// Set alertPanel
 		setFace(eval('face_'+boardSize+'Win'));	// Set btn to appropriate face
 	}
 }
@@ -408,7 +408,7 @@ function loseEndGame() {
 	setAlerts('You lost.');	// Inform the player
 }
 function displayMines() {
-	hasCheated = true;	// Set hasCheated to true if the game is active
+	hasCheated = true;	// Set hasCheated to true
 	if (board.length == 0) {	// Check if this is being called before the board has been generated
 		generateGameBoardData(0);	// Create the board real quick to avoid errors
 	}
@@ -511,6 +511,7 @@ function faceBtnHandler(ele, event) {
 	}
 }
 function setAlerts(alertString) {
+	// console.log(alertString);	// Show alert in console
 	document.getElementById('alertPanel').innerHTML = '<h2>'+alertString+'</h2>';	// Set the alert panel to display the passed message
 }
 function setFace(emojiCode) {
@@ -547,7 +548,7 @@ function updateMaxMines() {
 	mInput.max = rInput.value * cInput.value - 1;	// Set the max number of mines to be one less than the total number of cells
 }
 function printBoard() {
-	hasCheated = true;	// Set hasCheated to true if the game is active
+	hasCheated = true;	// Set hasCheated to true
 	for (let i=0; i<totalRows; i++) {	// Loop through every row
 		for (let j=0; j<totalCols; j++) {	// Loop through every column
 			let cur = document.getElementById('cell_'+i+'_'+j);	// Grab the cell
