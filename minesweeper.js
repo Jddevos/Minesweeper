@@ -11,11 +11,7 @@ const face_ques		= '\u{1f616}';	// Face to display after placing a sym_ques
 const face_down		= '\u{1f61c}';	// Face to display when the resetBtn is held down
 const face_error	= '\u{1f635}';	// Face to display when an error occurs
 const face_lost		= '\u{1f92f}';	// Face to display after losing
-const face_smWin	= '\u{1f609}';	// Face to display after winning a sm board
-const face_mdWin	= '\u{1f60a}';	// Face to display after winning a md board
-const face_lgWin	= '\u{1f60d}';	// Face to display after winning a lg board
-const face_xlWin	= '\u{1f60e}';	// Face to display after winning a xl board
-const face_cuWin	= '\u{1f636}';	// Face to display after winning a cu board
+const face_won		= '\u{1f60e}';	// Face to display after winning
 
 /*========================================DO NOT CHANGE THESE VARIABLES========================================*/
 var board   = [];	// This will hold the game board in its entirety
@@ -340,7 +336,7 @@ function checkWin() {
 		displayMines();	// Show remaining mines
 		updateFlagCount();	// Update the flag count (in case some were unmarked)
 		disableBoard();	// Don't allow any more input
-		setFace(eval('face_'+boardSize+'Win'));	// Set btn to appropriate face
+		setFace(face_won);	// Set btn to appropriate face
 	}
 }
 function checkSaveTime() {
@@ -393,7 +389,7 @@ function loseEndGame() {
 			if (board[i][j].mine && curCell.innerHTML != sym_flag && curCell.innerHTML != sym_expl) {	// Find mines that aren't marked
 				// console.log('Setting cell_'+i+'_'+j+' to '+sym_mine);
 				curCell.innerHTML = sym_mine;	// Mark them as mines
-				curCell.classList.add('textM', 'exploded');	// Set the appropriate classes
+				curCell.classList.add('textM', 'unfound');	// Set the appropriate classes
 			}
 
 			//X out the incorrect flags
