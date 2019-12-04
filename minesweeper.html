@@ -1,50 +1,57 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<title>Minesweeper</title>
-		<meta charset="UTF-8">
-		<link rel="stylesheet" href="minesweeperStyle.css" />
-		<script src="minesweeper.js"></script>
-	</head>
-	<body onload="start()" oncontextmenu="return false;">
-		<div id="settingsModal" class="modalDiv">
-			<div class="modalContent">
-				<div class="modalHeader">
-					<span class="close" onclick="closeSettings()">&times;</span>
-					<h3>Settings</h3>
-				</div>
-				<div class="modalBody">
-					<form autocomplete="off" id="settingsForm">
-						<p>
-							Leaderboard Name:<input type="text" name="userName" id="userName" class="input" size="5" maxlength="5" placeholder="AAAAA" defaultValue="AAAAA">
-						</p>
-						<p>
-							<select id="sizeSelector" onchange="enableDisableInput()">
-								<option value="sm">Small</option>
-								<option value="md">Medium</option>
-								<option value="lg">Large</option>
-								<option value="xl">Giant</option>
-								<option value="cu">Custom</option>
-							</select>
-							<span>&#124;&#124;</span>
-							Rows:<input type="number" name="rows" id="rows" min="8" max="999" value="8" class="input number" onchange="updateMaxMines()">
-							Columns:<input type="number" name="cols" id="cols" min="8" max="999" value="8" class="input number" onchange="updateMaxMines()">
-							Mines:<input type="number" name="mines" id="mines" min="8" max="99999" value="10" class="input number">
-						</p>
-					</form>
-				</div>
-				<div class="modalFooter">
-					<input type="button" onclick="confirmSettings()" value="Confirm Settings">
-					<input type="button" onclick="resetLeaderboards()" value="Reset Leaderboards">
-				</div>
+
+<head>
+	<title>Minesweeper</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="minesweeperStyle.css" />
+	<script src="minesweeper.js"></script>
+</head>
+
+<body onload="start()" oncontextmenu="return false;">
+	<div id="settingsModal" class="modalDiv">
+		<div class="modalContent">
+			<div class="modalHeader">
+				<span class="close" onclick="closeSettings()">&times;</span>
+				<h3>Settings</h3>
+			</div>
+			<div class="modalBody">
+				<form autocomplete="off" id="settingsForm">
+					<p>
+						Leaderboard Name:<input type="text" name="userName" id="userName" class="input" size="5"
+							maxlength="5" placeholder="AAAAA" defaultValue="AAAAA">
+					</p>
+					<p>
+						<select id="sizeSelector" onchange="enableDisableInput()">
+							<option value="sm">Small</option>
+							<option value="md">Medium</option>
+							<option value="lg">Large</option>
+							<option value="xl">Giant</option>
+							<option value="cu">Custom</option>
+						</select>
+						<span>&#124;&#124;</span>
+						Rows:<input type="number" name="rows" id="rows" min="8" max="999" value="8" class="input number"
+							onchange="updateMaxMines()">
+						Columns:<input type="number" name="cols" id="cols" min="8" max="999" value="8"
+							class="input number" onchange="updateMaxMines()">
+						Mines:<input type="number" name="mines" id="mines" min="8" max="99999" value="10"
+							class="input number">
+					</p>
+				</form>
+			</div>
+			<div class="modalFooter">
+				<input type="button" onclick="confirmSettings()" value="Confirm Settings">
+				<input type="button" onclick="resetLeaderboards()" value="Reset Leaderboards">
 			</div>
 		</div>
-		<div id="alertPanel"></div>
-		<div id="boardColumn">
-			<div id="board"></div>
-		</div>
-		<input type="button" id="settingsBtn" value="Settings" onclick="openSettings()">
-		<div id="leaders"></div>
-		<script src="timer.js"></script>
-	</body>
+	</div>
+	<div id="alertPanel"></div>
+	<div id="boardColumn">
+		<div id="board"></div>
+	</div>
+	<input type="button" id="settingsBtn" value="Settings" onclick="openSettings()">
+	<div id="leaders"></div>
+	<script src="timer.js"></script>
+</body>
+
 </html>

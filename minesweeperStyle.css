@@ -14,21 +14,21 @@ html {
 	border: 2px solid darkgray;
 	width: 100px;
 	height: 30px;
-	padding: 0
+	padding: 0;
 }
 #settingsForm {
 	display: block;
 	height: 20%;
 }
-input[type=button] {
+input[type='button'] {
 	cursor: pointer;
 }
-input[type=number] {
-	-moz-appearance: textfield;	/* Hide input spinners in Firefox */
+input[type='number'] {
+	-moz-appearance: textfield; /* Hide input spinners in Firefox */
 }
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button {
-	-webkit-appearance: none;	/* Hide input spinners in other browsers */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	-webkit-appearance: none; /* Hide input spinners in other browsers */
 	margin: 0;
 }
 .inputArea {
@@ -53,8 +53,8 @@ input[type=number]::-webkit-outer-spin-button {
 	width: 100%; /* Full width */
 	height: 100%; /* Full height */
 	overflow: auto; /* Enable scroll if needed */
-	background-color: rgb(0,0,0); /* Fallback color */
-	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+	background-color: rgb(0, 0, 0); /* Fallback color */
+	background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
 .modalContent {
 	position: relative;
@@ -63,11 +63,11 @@ input[type=number]::-webkit-outer-spin-button {
 	padding: 0;
 	border: 1px solid darkgray;
 	width: 50%;
-	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 	-webkit-animation-name: slideIn;
 	-webkit-animation-duration: 0.4s;
 	animation-name: slideIn;
-	animation-duration: 0.4s
+	animation-duration: 0.4s;
 }
 .close {
 	color: white;
@@ -96,12 +96,28 @@ input[type=number]::-webkit-outer-spin-button {
 	text-align: right;
 }
 @-webkit-keyframes slideIn {
-	from {bottom: -300px; left: -300px; opacity: 0} 
-	to {bottom: 0; left: 0; opacity: 1}
+	from {
+		bottom: -300px;
+		left: -300px;
+		opacity: 0;
+	}
+	to {
+		bottom: 0;
+		left: 0;
+		opacity: 1;
+	}
 }
 @keyframes slideIn {
-	from {bottom: -300px; left: -300px; opacity: 0}
-	to {bottom: 0; left: 0; opacity: 1}
+	from {
+		bottom: -300px;
+		left: -300px;
+		opacity: 0;
+	}
+	to {
+		bottom: 0;
+		left: 0;
+		opacity: 1;
+	}
 }
 
 /* MAIN AREA STYLING */
@@ -194,7 +210,6 @@ input[type=number]::-webkit-outer-spin-button {
 	white-space: nowrap;
 	left: 50%;
 	transform: translateX(-50%);
-
 }
 h2 {
 	margin: 4px;
@@ -216,7 +231,8 @@ th {
 tr:nth-child(odd) {
 	background-color: lightgray;
 }
-tr:nth-child(2n+6) {	/* Every other row, starting at number 6 */
+tr:nth-child(2n + 6) {
+	/* Every other row, starting at number 6 */
 	color: turquoise;
 }
 td {
@@ -264,7 +280,7 @@ td {
 	color: black;
 }
 .text0 {
-	color: rgba(0,0,0,0);
+	color: rgba(0, 0, 0, 0);
 }
 .text1 {
 	color: blue;
