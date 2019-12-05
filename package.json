@@ -1,0 +1,24 @@
+{
+  "name": "minesweeper",
+  "version": "1.0.0",
+  "description": "An HTML/JS game of minesweeper",
+  "main": "minesweeper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jddevos/Minesweeper.git"
+  },
+  "author": "Jeramy De Vos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jddevos/Minesweeper/issues"
+  },
+  "homepage": "https://github.com/Jddevos/Minesweeper#readme",
+  "devDependencies": {
+    "eslint": "^6.7.2",
+    "eslint-plugin-prettier": "^3.1.1",
+    "prettier": "1.19.1"
+  }
+}

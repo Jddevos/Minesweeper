@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const sym_mine = "\u{1f4a3}"; // Character to display to indicate a mine
 const sym_flag = "\u{1f6a9}"; // Character to display to indicate a flag
 const sym_ques = "\u{02753}"; // Character to display to indicate a question
@@ -565,7 +566,7 @@ function loseEndGame() {
 				//Find flags that are incorrect
 				if (debug) {
 					console.log(
-						"Setting cell_" + i + "_" + j + " to " + sym_wrong
+						"Setting cell_" + i + "_" + j + " to " + sym_wron
 					);
 				}
 				curCell.innerHTML = sym_wron; // Mark them as wrong
@@ -673,7 +674,7 @@ function isUndefined(array, row, col) {
 		return array[row][col] == undefined; // If the cell has a value, this will return false
 	} catch (e) {
 		// Catch exceptions
-		if ((e = "TypeError")) {
+		if (e == "TypeError") {
 			// Check for TypeError, which indicates undefined
 			return true; // Return true (this is an undefined cell)
 		} else {
