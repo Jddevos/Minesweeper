@@ -3,7 +3,7 @@
 		"browser": true,
 		"es6": true
 	},
-	"extends": ["plugin:prettier/recommended"],
+	"extends": ["eslint:recommended", "prettier"],
 	"globals": {
 		"Atomics": "readonly",
 		"SharedArrayBuffer": "readonly"
@@ -12,5 +12,9 @@
 		"ecmaVersion": 2018
 	},
 	"plugins": ["prettier"],
-	"rules": {}
+	"rules": {
+		"indent": ["error", "tab"],
+		"prettier/prettier": "error",
+		"no-tabs": ["error", { "allowIndentationTabs": true }]
+	}
 }
