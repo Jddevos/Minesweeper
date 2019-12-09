@@ -21,7 +21,7 @@ var toCheck = []; // Will hold the list of cells to check when expanding empty s
 var totalRows = 0; // Total number of rows
 var totalCols = 0; // Total number of columns
 var totalMines = 0; // Total number of mines
-// var boardSize = "sm"; // The size of the board
+var boardSize = "sm"; // The size of the board
 var priorRstBtnVal = face_default; // Will hold the value of the reset button
 var turnsTaken = 0; // Will hold the total number of turns taken
 var gameIsActive = false; // Flag indicating whether the game is currently active
@@ -671,16 +671,12 @@ function closeSettings() {
 function isUndefined(array, row, col) {
 	try {
 		// We want to attempt to access the passed cell
-		return array[row][col] == undefined; // If the cell has a value, this will return false
-	} catch (e) {
-		// Catch exceptions
-		if (e == "TypeError") {
-			// Check for TypeError, which indicates undefined
-			return true; // Return true (this is an undefined cell)
-		} else {
-			// If this is not a TypeError
-			console.log("Error " + e + " caught."); // Notify that other errors were caught
+		if (debug) {
+			console.log("Trying to access [" + row + "][" + col + "]");
 		}
+		return array[row][col] === undefined; // If the cell has a value, this will return false
+	} catch (e) {
+		return true; // Return true (this is an undefined cell)
 	}
 }
 function faceBtnHandler(ele, event) {
