@@ -13,7 +13,6 @@
 	},
 	"plugins": ["prettier"],
 	"rules": {
-		"indent": ["error", "tab"],
 		"prettier/prettier": "error",
 		"no-tabs": ["error", { "allowIndentationTabs": true }]
 	}

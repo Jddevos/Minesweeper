@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 const sym_mine = "\u{1f4a3}"; // Character to display to indicate a mine
 const sym_flag = "\u{1f6a9}"; // Character to display to indicate a flag
 const sym_ques = "\u{02753}"; // Character to display to indicate a question
